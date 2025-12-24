@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+.main-title {
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: sans-serif;
+  text-align: center;
+}
+

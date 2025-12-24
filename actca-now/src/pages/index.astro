@@ -1,0 +1,124 @@
+---
+// --- IMPORTS ---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopicPicker from '../components/TopicPicker.astro';
+import CallCard from '../components/CallCard.astro';
+import { getCollection } from 'astro:content';
+
+// --- DATA FETCHING ---
+const allCalls = await getCollection('calls');
+
+// --- BUTTON COLORS BY TOPIC ---
+const topicColorMap: Record<string, { bg: string; text: string; border: string; hover: string }> = {
+  'water': { bg: '#3b82f6', text: '#ffffff', border: '#2563eb', hover: '#60a5fa' }, // blue
+  'rights': { bg: '#ef4444', text: '#ffffff', border: '#dc2626', hover: '#f87171' }, // red
+  'rail': { bg: '#f97316', text: '#ffffff', border: '#ea580c', hover: '#fb923c' }, // orange
+  'econ': { bg: '#22c55e', text: '#ffffff', border: '#16a34a', hover: '#4ade80' }, // green
+  'housing': { bg: '#facc15', text: '#0f172a', border: '#eab308', hover: '#fde047' }, // yellow
+  'health': { bg: '#a855f7', text: '#ffffff', border: '#9333ea', hover: '#c084fc' }  // purple
+};
+---
+
+<BaseLayout>
+  <main class="container mx-auto px-4 py-8 max-w-6xl">
+    <!-- Header -->
+    <header class="mb-8 text-center">
+      <h1 class="main-title text-yellow-400 mb-4">Make Your Voice Heard!</h1>
+    </header>
+    
+    <!-- Topic Slugs as Buttons - Opening Screen -->
+    <div x-data="{ 
+      selectedCall: null,
+      getTopicLabel(topic) {
+        const labels = {
+          'rail': 'Rail',
+          'housing': 'Housing',
+          'water': 'Water',
+          'health': 'Health',
+          'rights': 'Rights',
+          'econ': 'Economy'
+        };
+        return labels[topic] || topic;
+      }
+    }">
+      <!-- Topic Buttons (Slugs) - Shown when no call is selected -->
+      <div 
+        x-show="selectedCall === null"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        class="mb-8"
+      >
+        {allCalls.map((call) => {
+          const topicValue = call.data.topic;
+          const topicLabels = {
+            'rail': 'High Speed Rail - NOW',
+            'housing': 'YIMBY - Housing',
+            'water': 'Water',
+            'health': 'Healthcare for Californians',
+            'rights': 'Rights - Fight I.C.E.',
+            'econ': 'CA $ for CA'
+          };
+          const topicEmojis = {
+            'rail': '🚄',
+            'housing': '🏠',
+            'water': '💧',
+            'health': '❤️‍🩹',
+            'rights': '✊🏾',
+            'econ': '💰'
+          };
+          const topicLabel = topicLabels[topicValue as keyof typeof topicLabels] || topicValue;
+          const topicEmoji = topicEmojis[topicValue as keyof typeof topicEmojis] || '→';
+          
+          const colors = topicColorMap[topicValue] || { bg: '#1e293b', text: '#facc15', border: '#334155', hover: '#334155' };
+          
+          return (
+            <button
+              type="button"
+              @click={`selectedCall = '${call.id}'`}
+              class="w-full min-h-[50px] font-bold text-xl rounded-2xl flex items-center justify-between transition-all duration-200 border-2 active:scale-[0.98] shadow-lg hover:shadow-xl cursor-pointer"
+              style={`background-color: ${colors.bg}; color: ${colors.text}; border-color: ${colors.border}; display: block; margin-bottom: 1rem; border-radius: 1rem; padding-left: 1.0rem; padding-right: 1.0rem; padding-top: .5rem; padding-bottom: .5rem;`}
+              onmouseover={`this.style.backgroundColor='${colors.hover}'`}
+              onmouseout={`this.style.backgroundColor='${colors.bg}'`}
+            >
+              <span class="flex items-center gap-6">
+                <span class="text-3xl">{topicEmoji}</span>
+                <span class="text-left text-xl">{topicLabel}</span>
+              </span>
+              {call.data.priority && (
+                <span class="text-xs bg-slate-950 text-yellow-400 px-3 py-1.5 rounded-full font-bold whitespace-nowrap border border-yellow-400">URGENT</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      
+      <!-- Call Cards - Shown when a slug is selected -->
+      {allCalls.map((call) => {
+        return (
+          <div 
+            x-show={`selectedCall === '${call.id}'`}
+            x-cloak
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 transform scale-95"
+            x-transition:enter-end="opacity-100 transform scale-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 transform scale-100"
+            x-transition:leave-end="opacity-0 transform scale-95"
+          >
+            <!-- Back Button -->
+            <button
+              type="button"
+              @click="selectedCall = null"
+              class="mb-4 px-4 py-2 text-yellow-400 hover:text-yellow-300 font-semibold flex items-center gap-2"
+            >
+              ← Back to Topics
+            </button>
+            <CallCard call={call} targetID={call.id} />
+          </div>
+        );
+      })}
+    </div>
+  </main>
+</BaseLayout>
+

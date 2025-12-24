@@ -1,0 +1,8 @@
+---
+description: Standards for ActCA.now development
+globs: src/**/*.{astro,ts,js}
+---
+# ActCA.now Dev Rules
+- Maintain "Bridge AI" scannability with heading comments.
+Thumb-First UI: Action buttons must be min-height 60px.
+- Use Git-based content collections for all political targets.
