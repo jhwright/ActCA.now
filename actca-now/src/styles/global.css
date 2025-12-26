@@ -146,3 +146,16 @@
   }
 }
 
+/* Ensure navigation links are visible and clickable */
+nav a {
+  color: #000 !important;
+  text-decoration: underline !important;
+  font-weight: 600 !important;
+  z-index: 100;
+  position: relative;
+}
+
+nav a:hover {
+  color: #334155 !important;
+}
+
