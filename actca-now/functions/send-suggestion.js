@@ -48,67 +48,60 @@ export const handler = async (event, context) => {
       };
     }
 
-    // Get recipient email from environment variable, or use default
-    const recipientEmail = process.env.SUGGESTION_EMAIL || process.env.CONTACT_EMAIL || 'suggestions@actca.now';
-    
-    // Format email content
-    const emailBody = `
-New Suggestion from ActCA.now
+    // Send to Discord webhook
+    const discordWebhook = process.env.DISCORD_WEBHOOK_URL;
 
-${name ? `Name: ${name}` : 'Name: (not provided)'}
-${email ? `Email: ${email}` : 'Email: (not provided)'}
+    if (discordWebhook) {
+      try {
+        const discordResponse = await fetch(discordWebhook, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            embeds: [{
+              title: '💡 New Suggestion from ActCA.now',
+              color: 0xFACC15, // Yellow-400
+              fields: [
+                {
+                  name: '👤 Name',
+                  value: name || 'Anonymous',
+                  inline: true
+                },
+                {
+                  name: '📧 Email',
+                  value: email || 'Not provided',
+                  inline: true
+                },
+                {
+                  name: '💬 Message',
+                  value: message.length > 1024 ? message.substring(0, 1021) + '...' : message,
+                  inline: false
+                }
+              ],
+              timestamp: new Date().toISOString(),
+              footer: {
+                text: `IP: ${event.headers['x-forwarded-for'] || event.requestContext?.identity?.sourceIp || 'unknown'}`
+              }
+            }]
+          })
+        });
 
-Message:
-${message}
-
----
-Sent from ActCA.now suggestion form
-Timestamp: ${new Date().toISOString()}
-IP: ${event.headers['x-forwarded-for'] || event.requestContext?.identity?.sourceIp || 'unknown'}
-    `.trim();
-
-    // For now, log to console (can be replaced with actual email service)
-    // In production, you can integrate with:
-    // - SendGrid
-    // - AWS SES
-    // - Mailgun
-    // - Netlify Forms (if using built-in forms)
-    // - Or any other email service
-    
-    console.log('Suggestion received:', {
-      name: name || 'anonymous',
-      email: email || 'no email',
-      message: message.substring(0, 100) + '...',
-      timestamp: new Date().toISOString(),
-      ip: event.headers['x-forwarded-for'] || event.requestContext?.identity?.sourceIp || 'unknown',
-    });
-
-    // TODO: Implement actual email sending
-    // Example with fetch to an email service API:
-    /*
-    const emailResponse = await fetch('https://api.sendgrid.com/v3/mail/send', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.SENDGRID_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        personalizations: [{
-          to: [{ email: recipientEmail }],
-        }],
-        from: { email: 'noreply@actca.now' },
-        subject: `[ActCA.now Suggestion] ${subject}`,
-        content: [{
-          type: 'text/plain',
-          value: emailBody,
-        }],
-      }),
-    });
-    
-    if (!emailResponse.ok) {
-      throw new Error('Failed to send email');
+        if (!discordResponse.ok) {
+          console.error('Discord webhook failed:', await discordResponse.text());
+        }
+      } catch (error) {
+        console.error('Failed to send Discord notification:', error);
+        // Don't fail the whole request if Discord fails
+      }
+    } else {
+      console.log('No Discord webhook configured. Suggestion received:', {
+        name: name || 'anonymous',
+        email: email || 'no email',
+        message: message.substring(0, 100) + '...',
+        timestamp: new Date().toISOString(),
+      });
     }
-    */
 
     // Success response
     return {
