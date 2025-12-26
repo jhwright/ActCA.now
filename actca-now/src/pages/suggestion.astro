@@ -1,0 +1,183 @@
+---
+// --- IMPORTS ---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout 
+  title="Suggestion Box - Make Your Voice Heard!"
+  description="Share your suggestions and feedback"
+>
+  <main class="container mx-auto px-4 py-8 max-w-2xl min-h-screen">
+    <header class="mb-8 text-center">
+      <h1 class="text-4xl font-bold text-black mb-4">💬 Suggestion Box</h1>
+      <p class="text-lg text-gray-600">
+        Have an idea? Found a bug? Want to suggest a new topic? We'd love to hear from you!
+      </p>
+    </header>
+
+    <form 
+      id="suggestion-form"
+      class="bg-white border-2 border-gray-300 rounded-lg p-6 shadow-lg"
+      method="POST"
+      action="/.netlify/functions/submit-suggestion"
+    >
+      <div class="space-y-6">
+        <!-- Email Field -->
+        <div>
+          <label 
+            for="email" 
+            class="block text-sm font-semibold text-gray-700 mb-2"
+          >
+            Your Email <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-colors"
+            placeholder="your.email@example.com"
+            autocomplete="email"
+          />
+        </div>
+
+        <!-- Suggestion Field -->
+        <div>
+          <label 
+            for="suggestion" 
+            class="block text-sm font-semibold text-gray-700 mb-2"
+          >
+            Your Suggestion <span class="text-red-500">*</span>
+          </label>
+          <textarea
+            id="suggestion"
+            name="suggestion"
+            required
+            rows="8"
+            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 transition-colors resize-y"
+            placeholder="Share your thoughts, ideas, or feedback here..."
+          ></textarea>
+        </div>
+
+        <!-- hCaptcha -->
+        <div>
+          <div 
+            class="h-captcha" 
+            data-sitekey="801c9550-cb7a-454c-be1a-39164d14e85c"
+            data-callback="onCaptchaSuccess"
+          ></div>
+          <input type="hidden" id="h-captcha-response" name="h-captcha-response" />
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          id="submit-btn"
+          disabled
+          class="w-full min-h-[64px] font-extrabold text-xl rounded-2xl flex items-center justify-center text-center transition-all duration-200 active:scale-[0.98] cursor-pointer px-5 py-3 focus-visible:outline-none bg-gray-300 text-gray-500 cursor-not-allowed"
+        >
+          <span class="flex items-center gap-3">
+            <span aria-hidden="true">📤</span>
+            <span>Submit Suggestion</span>
+          </span>
+        </button>
+
+        <!-- Success/Error Messages -->
+        <div id="form-message" class="hidden text-center font-semibold"></div>
+      </div>
+    </form>
+
+    <!-- Back Link -->
+    <div class="mt-8 text-center">
+      <a 
+        href="/"
+        class="inline-block px-6 py-3 text-gray-600 hover:text-gray-900 font-semibold underline transition-colors"
+      >
+        ← Back to Action Center
+      </a>
+    </div>
+  </main>
+</BaseLayout>
+
+<!-- hCaptcha Script -->
+<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+
+<script>
+  // Enable submit button when captcha is completed
+  function onCaptchaSuccess(token) {
+    const submitBtn = document.getElementById('submit-btn');
+    const captchaInput = document.getElementById('h-captcha-response');
+    if (submitBtn && captchaInput) {
+      captchaInput.value = token;
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+      submitBtn.classList.add('call-cta');
+    }
+  }
+
+  // Handle form submission
+  const form = document.getElementById('suggestion-form');
+  const messageDiv = document.getElementById('form-message');
+  
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submit-btn');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+      }
+
+      const email = form.querySelector('#email').value;
+      const suggestion = form.querySelector('#suggestion').value;
+      const captchaToken = form.querySelector('#h-captcha-response').value;
+      
+      const payload = {
+        email,
+        suggestion,
+        'h-captcha-response': captchaToken,
+      };
+      
+      try {
+        const response = await fetch('/.netlify/functions/submit-suggestion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          messageDiv.textContent = '✅ Thank you! Your suggestion has been submitted.';
+          messageDiv.className = 'text-green-600';
+          messageDiv.classList.remove('hidden');
+          form.reset();
+          // Reset captcha
+          if (window.hcaptcha) {
+            window.hcaptcha.reset();
+          }
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('call-cta');
+            submitBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            submitBtn.innerHTML = '<span class="flex items-center gap-3"><span aria-hidden="true">📤</span><span>Submit Suggestion</span></span>';
+          }
+        } else {
+          throw new Error(result.error || 'Submission failed');
+        }
+      } catch (error) {
+        messageDiv.textContent = `❌ Error: ${error.message}. Please try again.`;
+        messageDiv.className = 'text-red-600';
+        messageDiv.classList.remove('hidden');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span class="flex items-center gap-3"><span aria-hidden="true">📤</span><span>Submit Suggestion</span></span>';
+        }
+      }
+    });
+  }
+</script>
+
