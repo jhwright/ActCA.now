@@ -8,10 +8,24 @@ const allCalls = await getCollection('calls');
 ---
 
 <BaseLayout>
-  <main class="relative min-h-screen">
+  <main class="relative min-h-screen bg-white">
     <!-- Header - Top Right -->
-    <header class="absolute top-8 right-8">
+    <header class="absolute top-8 right-8 flex flex-col items-end gap-4">
       <h1 class="text-2xl font-bold text-black">Make Your Voice Heard!</h1>
+      <nav class="flex gap-4">
+        <a 
+          href="/suggestions"
+          class="text-black hover:text-slate-700 font-semibold underline"
+        >
+          Suggestions
+        </a>
+        <a 
+          href="/resources"
+          class="text-black hover:text-slate-700 font-semibold underline"
+        >
+          Resources
+        </a>
+      </nav>
     </header>
     
     <!-- No-JS topic navigation (Safari-safe): rows are plain links to static pages -->
