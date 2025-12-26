@@ -81,3 +81,13 @@
   outline-offset: 2px;
 }
 
+/* Keep the call script visible while scrolling the call card (especially on mobile). */
+.call-script-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgb(15 23 42); /* slate-900 */
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+

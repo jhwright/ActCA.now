@@ -28,6 +28,8 @@ const formattedPhone = formatPhoneNumber(data.phone);
 <div 
   class="bg-slate-900 rounded-lg border border-slate-800 mb-4 flex flex-col"
   style="max-height: calc(100vh - 8rem);"
+  data-call-card
+  data-target-id={targetID}
 >
   <!-- Fixed Header Section -->
   <div class="p-6 pb-4 flex-shrink-0">
@@ -55,9 +57,9 @@ const formattedPhone = formatPhoneNumber(data.phone);
   </div>
   
   <!-- Scrollable Content Area -->
-  <div class="flex-1 overflow-y-auto px-6 pb-4">
-    <!-- Script -->
-    <div class="mb-4">
+  <div class="flex-1 overflow-y-auto px-6 pb-4" data-call-scroll>
+    <!-- Script (sticky so it stays visible while you scroll on mobile) -->
+    <div class="call-script-sticky mb-4">
       <p class="text-white text-lg font-semibold leading-relaxed">{data.script}</p>
     </div>
     
@@ -77,7 +79,7 @@ const formattedPhone = formatPhoneNumber(data.phone);
     <!-- Tap to Call Button - Styled like opening page buttons -->
     <a
       href={`tel:${data.phone}`}
-      class="call-cta w-full min-h-[64px] font-extrabold text-2xl rounded-2xl flex items-center justify-center text-center transition-all duration-200 active:scale-[0.98] cursor-pointer px-5 py-3 focus-visible:outline-none"
+      class="call-cta js-call-cta w-full min-h-[64px] font-extrabold text-2xl rounded-2xl flex items-center justify-center text-center transition-all duration-200 active:scale-[0.98] cursor-pointer px-5 py-3 focus-visible:outline-none"
       aria-label={`Call ${data.officialName} at ${formattedPhone}`}
     >
       <span class="flex items-center gap-3">
@@ -88,4 +90,46 @@ const formattedPhone = formatPhoneNumber(data.phone);
     </a>
   </div>
 </div>
+
+<script is:inline>
+  // Persist scroll position so when you return from the phone dialer on mobile,
+  // the script stays put instead of jumping back to the top.
+  (() => {
+    const card = document.querySelector('[data-call-card]');
+    if (!card) return;
+
+    const scrollEl = card.querySelector('[data-call-scroll]');
+    const callLink = card.querySelector('.js-call-cta');
+    const targetID = card.getAttribute('data-target-id') || 'unknown';
+    if (!scrollEl || !callLink) return;
+
+    const key = `actca:callScroll:${targetID}`;
+
+    const save = () => {
+      try {
+        localStorage.setItem(key, String(scrollEl.scrollTop || 0));
+      } catch {}
+    };
+
+    const restore = () => {
+      try {
+        const raw = localStorage.getItem(key);
+        if (raw == null) return;
+        const y = Number(raw);
+        if (!Number.isFinite(y)) return;
+        scrollEl.scrollTop = y;
+      } catch {}
+    };
+
+    callLink.addEventListener('click', save, { passive: true });
+    window.addEventListener('pagehide', save, { passive: true });
+    window.addEventListener('pageshow', restore, { passive: true });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') restore();
+    });
+
+    // Initial load
+    restore();
+  })();
+</script>
 
