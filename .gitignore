@@ -1,6 +1,7 @@
 # OS
 .DS_Store
 Thumbs.db
+*.bak
 
 # Local Netlify folder
 .netlify
