@@ -16,7 +16,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </header>
     
     <!-- Suggestion Form -->
-    <div class="bg-white rounded-lg border-2 border-slate-300 p-6 mb-6">
+    <div class="bg-slate-900 rounded-2xl border-2 border-slate-800 p-8 mb-6 shadow-xl">
       <form 
         id="suggestion-form"
         class="space-y-6"
@@ -27,7 +27,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div>
           <label 
             for="name" 
-            class="block text-sm font-semibold text-slate-900 mb-2"
+            class="block text-base font-bold text-yellow-400 mb-3"
           >
             Name (optional)
           </label>
@@ -35,7 +35,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             type="text"
             id="name"
             name="name"
-            class="w-full px-4 py-3 border-2 border-slate-400 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 text-slate-900 bg-white"
+            class="w-full px-5 py-4 border-2 border-slate-700 rounded-xl focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 text-white bg-slate-800 text-lg placeholder-slate-500"
             placeholder="Your name"
           />
         </div>
@@ -44,7 +44,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div>
           <label 
             for="email" 
-            class="block text-sm font-semibold text-slate-900 mb-2"
+            class="block text-base font-bold text-yellow-400 mb-3"
           >
             Email (optional)
           </label>
@@ -52,26 +52,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             type="email"
             id="email"
             name="email"
-            class="w-full px-4 py-3 border-2 border-slate-400 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 text-slate-900 bg-white"
+            class="w-full px-5 py-4 border-2 border-slate-700 rounded-xl focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 text-white bg-slate-800 text-lg placeholder-slate-500"
             placeholder="your@email.com"
-          />
-        </div>
-        
-        <!-- Subject Field -->
-        <div>
-          <label 
-            for="subject" 
-            class="block text-sm font-semibold text-slate-900 mb-2"
-          >
-            Subject
-          </label>
-          <input
-            type="text"
-            id="subject"
-            name="subject"
-            required
-            class="w-full px-4 py-3 border-2 border-slate-400 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 text-slate-900 bg-white"
-            placeholder="Brief description of your suggestion"
           />
         </div>
         
@@ -79,26 +61,29 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div>
           <label 
             for="message" 
-            class="block text-sm font-semibold text-slate-900 mb-2"
+            class="block text-base font-bold text-yellow-400 mb-3"
           >
             Your Suggestion
           </label>
           <textarea
             id="message"
             name="message"
-            rows="8"
+            rows="10"
             required
-            class="w-full px-4 py-3 border-2 border-slate-400 rounded-lg focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 text-slate-900 bg-white resize-y"
-            placeholder="Share your ideas, feedback, or suggestions..."
+            class="w-full px-5 py-4 border-2 border-slate-700 rounded-xl focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 text-white bg-slate-800 resize-y text-lg placeholder-slate-500 leading-relaxed"
+            placeholder="Share your ideas, feedback, or suggestions for ActCA.now..."
           ></textarea>
         </div>
         
-        <!-- Submit Button -->
+        <!-- Submit Button - Styled like the Tap to Call button -->
         <button
           type="submit"
-          class="w-full min-h-[64px] bg-yellow-400 text-slate-950 font-extrabold text-xl rounded-xl flex items-center justify-center hover:bg-yellow-300 transition-all duration-200 active:scale-[0.98] cursor-pointer border-4 border-yellow-600 shadow-lg"
+          class="call-cta w-full min-h-[72px] font-extrabold text-2xl rounded-2xl flex items-center justify-center text-center transition-all duration-200 active:scale-[0.98] cursor-pointer px-6 py-4 focus-visible:outline-none"
         >
-          📧 Send Suggestion
+          <span class="flex items-center gap-3">
+            <span aria-hidden="true">📤</span>
+            <span class="uppercase tracking-wide">Send Suggestion</span>
+          </span>
         </button>
       </form>
       

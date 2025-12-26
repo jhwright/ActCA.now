@@ -31,10 +31,10 @@ export const handler = async (event, context) => {
 
   try {
     // Parse request body
-    const { name, email, subject, message } = JSON.parse(event.body || '{}');
+    const { name, email, message } = JSON.parse(event.body || '{}');
 
     // Validate required fields
-    if (!subject || !message) {
+    if (!message) {
       return {
         statusCode: 400,
         headers: {
@@ -42,7 +42,7 @@ export const handler = async (event, context) => {
           'Access-Control-Allow-Origin': '*',
         },
         body: JSON.stringify({ 
-          error: 'Subject and message are required',
+          error: 'Message is required',
           success: false,
         }),
       };
@@ -55,7 +55,6 @@ export const handler = async (event, context) => {
     const emailBody = `
 New Suggestion from ActCA.now
 
-Subject: ${subject}
 ${name ? `Name: ${name}` : 'Name: (not provided)'}
 ${email ? `Email: ${email}` : 'Email: (not provided)'}
 
@@ -77,7 +76,6 @@ IP: ${event.headers['x-forwarded-for'] || event.requestContext?.identity?.source
     // - Or any other email service
     
     console.log('Suggestion received:', {
-      subject,
       name: name || 'anonymous',
       email: email || 'no email',
       message: message.substring(0, 100) + '...',
