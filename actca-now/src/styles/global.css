@@ -91,3 +91,24 @@
   padding-bottom: 0.25rem;
 }
 
+/* Force light mode colors - override any browser dark mode */
+.text-white {
+  color: #fff !important;
+}
+
+.text-black {
+  color: #000 !important;
+}
+
+.bg-white {
+  background-color: #fff !important;
+}
+
+.bg-slate-900 {
+  background-color: rgb(15 23 42) !important;
+}
+
+.bg-slate-800 {
+  background-color: rgb(30 41 59) !important;
+}
+
