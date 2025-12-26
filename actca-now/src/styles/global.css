@@ -91,13 +91,25 @@
   padding-bottom: 0.25rem;
 }
 
-/* Force light mode colors - override any browser dark mode */
+/* Force light mode colors - override any browser dark mode and Safari overrides */
 .text-white {
   color: #fff !important;
 }
 
 .text-black {
   color: #000 !important;
+}
+
+.text-yellow-400 {
+  color: #facc15 !important;
+}
+
+.text-slate-300 {
+  color: #cbd5e1 !important;
+}
+
+.text-slate-700 {
+  color: #334155 !important;
 }
 
 .bg-white {
@@ -110,5 +122,27 @@
 
 .bg-slate-800 {
   background-color: rgb(30 41 59) !important;
+}
+
+.bg-slate-700 {
+  background-color: rgb(51 65 85) !important;
+}
+
+/* Safari-specific: Force colors on light mode */
+@supports (-webkit-hyphens:none) {
+  [data-call-card] .text-yellow-400 {
+    color: #facc15 !important;
+    -webkit-text-fill-color: #facc15 !important;
+  }
+  
+  [data-call-card] .text-white {
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+  }
+  
+  [data-call-card] .text-slate-300 {
+    color: #cbd5e1 !important;
+    -webkit-text-fill-color: #cbd5e1 !important;
+  }
 }
 
