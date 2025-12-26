@@ -29,30 +29,8 @@ npm install
 npm run dev
 ```
 
-### Netlify function endpoints
-After deploy, the functions are available at:
+### Netlify function endpoint
+After deploy, the function is available at:
 - `/.netlify/functions/log-call`
-- `/.netlify/functions/submit-suggestion`
-
-### Suggestion Box Setup
-
-The suggestion box form uses **hCaptcha** for spam protection. To enable it:
-
-1. **Get hCaptcha keys**:
-   - Sign up at [hCaptcha](https://www.hcaptcha.com/)
-   - Create a site and get your **Site Key** and **Secret Key**
-
-2. **Update the form**:
-   - Edit `actca-now/src/pages/suggestion.astro`
-   - Replace the test site key `10000000-ffff-ffff-ffff-000000000001` with your real **Site Key** (line ~67)
-
-3. **Set Netlify environment variable**:
-   - In Netlify dashboard → Site settings → Environment variables
-   - Add: `HCAPTCHA_SECRET_KEY` = your hCaptcha **Secret Key**
-
-4. **Email notifications** (optional):
-   - Currently, submissions are logged to Netlify function logs
-   - To receive email notifications, uncomment and configure the email sending code in `actca-now/functions/submit-suggestion.js`
-   - You can use SendGrid, AWS SES, or Netlify's email service
 
 

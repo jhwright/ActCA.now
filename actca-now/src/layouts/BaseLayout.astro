@@ -1,7 +1,6 @@
 ---
 // --- IMPORTS ---
 import '../styles/global.css';
-import Footer from '../components/Footer.astro';
 
 // --- PROPS ---
 interface Props {
@@ -42,9 +41,8 @@ const {
     
     <title>{title}</title>
   </head>
-  <body class="bg-white text-black flex flex-col min-h-screen">
+  <body class="bg-white text-black">
     <slot />
-    <Footer />
   </body>
 </html>
 
