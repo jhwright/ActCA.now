@@ -11,6 +11,7 @@ interface Props {
 const { call, targetID } = Astro.props;
 const { data } = call;
 const photoPath = `/officials/${call.id}.jpg`;
+const placeholderImage = '/officials/placeholder.svg';
 
 // Format phone number as (xxx) xxx-xxxx
 function formatPhoneNumber(phone: string): string {
@@ -25,7 +26,6 @@ const formattedPhone = formatPhoneNumber(data.phone);
 ---
 
 <div 
-  x-data="{ showRationale: false }"
   class="bg-slate-900 rounded-lg border border-slate-800 mb-4 flex flex-col"
   style="max-height: calc(100vh - 8rem);"
 >
@@ -46,7 +46,7 @@ const formattedPhone = formatPhoneNumber(data.phone);
         src={photoPath} 
         alt={`${data.officialName}`}
         class="w-20 h-20 rounded-full object-cover border-2 border-yellow-400"
-        onerror={`this.style.display = 'none';`}
+        onerror={`this.onerror=null; this.src='${placeholderImage}'; this.style.display='none';`}
       />
       <div class="flex-1">
         <h3 class="text-xl font-bold text-yellow-400 mb-1">{data.officialName}, {data.officialTitle}</h3>
@@ -61,28 +61,15 @@ const formattedPhone = formatPhoneNumber(data.phone);
       <p class="text-white text-lg font-semibold leading-relaxed">{data.script}</p>
     </div>
     
-    <!-- Rationale - Hidden by default, shown when button clicked -->
-    <div 
-      x-show="showRationale"
-      x-transition:enter="transition ease-out duration-200"
-      x-transition:enter-start="opacity-0 transform -translate-y-2"
-      x-transition:enter-end="opacity-100 transform translate-y-0"
-      x-transition:leave="transition ease-in duration-150"
-      x-transition:leave-start="opacity-100 transform translate-y-0"
-      x-transition:leave-end="opacity-0 transform -translate-y-2"
-      class="mb-4 p-4 bg-slate-800 rounded-lg border border-slate-700"
-    >
-      <p class="text-slate-300 text-sm leading-relaxed">{data.rationale}</p>
-    </div>
-    
-    <!-- Rationale Button -->
-    <button
-      @click="showRationale = !showRationale"
-      class="w-full mb-4 min-h-[48px] bg-slate-800 text-yellow-400 font-semibold text-base rounded-lg flex items-center justify-center hover:bg-slate-700 transition-colors border-2 border-slate-700 hover:border-yellow-400/50"
-    >
-      <span x-show="!showRationale">ℹ️ Show Rationale</span>
-      <span x-show="showRationale">ℹ️ Hide Rationale</span>
-    </button>
+    <!-- No-JS rationale toggle -->
+    <details class="mb-4 bg-slate-800 rounded-lg border-2 border-slate-700">
+      <summary class="min-h-[48px] px-4 text-yellow-400 font-semibold text-base flex items-center justify-center hover:bg-slate-700 transition-colors cursor-pointer select-none">
+        ℹ️ Rationale
+      </summary>
+      <div class="p-4 border-t border-slate-700">
+        <p class="text-slate-300 text-sm leading-relaxed">{data.rationale}</p>
+      </div>
+    </details>
   </div>
   
   <!-- Fixed Bottom Button -->
@@ -90,26 +77,14 @@ const formattedPhone = formatPhoneNumber(data.phone);
     <!-- Tap to Call Button - Styled like opening page buttons -->
     <a
       href={`tel:${data.phone}`}
-      class="w-full min-h-[50px] font-bold text-xl rounded-2xl flex items-center justify-center text-center transition-all duration-200 border-2 active:scale-[0.98] shadow-lg hover:shadow-xl cursor-pointer"
-      style={`background-color: #facc15; color: #0f172a; border-color: #eab308; padding-left: 1.0rem; padding-right: 1.0rem; padding-top: .5rem; padding-bottom: .5rem;`}
-      data-target-id={targetID}
-      onmouseover={`this.style.backgroundColor='#fde047'`}
-      onmouseout={`this.style.backgroundColor='#facc15'`}
-      onclick={`(async () => {
-        try {
-          const zip = prompt('Enter your ZIP code (optional):') || 'unknown';
-          const targetID = this.getAttribute('data-target-id');
-          await fetch('/.netlify/functions/log-call', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ targetID, zip })
-          });
-        } catch (err) {
-          console.error('Failed to log call:', err);
-        }
-      })(); return true;`}
+      class="call-cta w-full min-h-[64px] font-extrabold text-2xl rounded-2xl flex items-center justify-center text-center transition-all duration-200 active:scale-[0.98] cursor-pointer px-5 py-3 focus-visible:outline-none"
+      aria-label={`Call ${data.officialName} at ${formattedPhone}`}
     >
-      📞 Tap to Call: {formattedPhone}
+      <span class="flex items-center gap-3">
+        <span aria-hidden="true">📞</span>
+        <span class="uppercase tracking-wide">Tap to call</span>
+        <span class="opacity-90 font-black">{formattedPhone}</span>
+      </span>
     </a>
   </div>
 </div>

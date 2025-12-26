@@ -1,11 +1,30 @@
 // --- Netlify Serverless Function: log-call.js ---
 // Logs call actions to Google Sheets (placeholder implementation)
 
-exports.handler = async (event, context) => {
+export const handler = async (event, context) => {
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      },
+      body: '',
+    };
+  }
+
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      },
       body: JSON.stringify({ error: 'Method not allowed' }),
     };
   }
@@ -54,6 +73,8 @@ exports.handler = async (event, context) => {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
       },
       body: JSON.stringify({
         error: 'Internal server error',
@@ -62,4 +83,5 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
 

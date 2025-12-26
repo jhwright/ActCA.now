@@ -22,6 +22,9 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     
     <!-- OpenGraph Tags for Richmond-specific social sharing -->
     <meta property="og:title" content={title} />
@@ -37,11 +40,8 @@ const {
     <meta name="twitter:description" content={description} />
     
     <title>{title}</title>
-    <style>
-      [x-cloak] { display: none !important; }
-    </style>
   </head>
-  <body class="bg-slate-950 text-white">
+  <body class="bg-white text-black">
     <slot />
   </body>
 </html>

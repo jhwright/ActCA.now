@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CallCard from '../../components/CallCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const calls = await getCollection('calls');
+  return calls.map((call) => ({
+    params: { id: call.id },
+    props: { call },
+  }));
+}
+
+const { call } = Astro.props;
+---
+
+<BaseLayout title="Make Your Voice Heard!" description="Make Your Voice Heard!">
+  <main class="min-h-screen p-6">
+    <a
+      href="/"
+      class="inline-flex items-center gap-2 mb-4 px-4 py-2 text-black hover:text-gray-700 font-semibold"
+    >
+      ← Back to Topics
+    </a>
+
+    <CallCard call={call} targetID={call.id} />
+  </main>
+</BaseLayout>
+
+

@@ -1,5 +1,9 @@
 [build]
+  base = "actca-now"
   command = "npm run build"
   publish = "dist"
+
 [functions]
   directory = "functions"
+
+

@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Local Netlify folder
+.netlify
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.astro/
+
+# Environment variables
+.env
+.env.*
+
+
