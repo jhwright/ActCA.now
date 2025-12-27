@@ -94,14 +94,33 @@ const formattedPhone = formatPhoneNumber(data.phone);
 <script is:inline>
   // Persist scroll position so when you return from the phone dialer on mobile,
   // the script stays put instead of jumping back to the top.
+  // Also track phone number clicks.
   (() => {
-    const card = document.querySelector('[data-call-card]');
-    if (!card) return;
+    console.log('CallCard script: Starting initialization...');
+    
+    // Wait for DOM to be ready
+    const init = () => {
+      const card = document.querySelector('[data-call-card]');
+      console.log('CallCard script: Card element found:', !!card);
+      if (!card) {
+        console.warn('CallCard script: [data-call-card] not found');
+        return;
+      }
 
-    const scrollEl = card.querySelector('[data-call-scroll]');
-    const callLink = card.querySelector('.js-call-cta');
-    const targetID = card.getAttribute('data-target-id') || 'unknown';
-    if (!scrollEl || !callLink) return;
+      const scrollEl = card.querySelector('[data-call-scroll]');
+      const callLink = card.querySelector('.js-call-cta');
+      const targetID = card.getAttribute('data-target-id') || 'unknown';
+      
+      console.log('CallCard script: Elements found:', {
+        scrollEl: !!scrollEl,
+        callLink: !!callLink,
+        targetID: targetID
+      });
+      
+      if (!scrollEl || !callLink) {
+        console.warn('CallCard script: Missing required elements (scrollEl or callLink)');
+        return;
+      }
 
     const key = `actca:callScroll:${targetID}`;
 
@@ -121,7 +140,51 @@ const formattedPhone = formatPhoneNumber(data.phone);
       } catch {}
     };
 
-    callLink.addEventListener('click', save, { passive: true });
+    // Track phone number clicks
+    const trackPhoneClick = (e) => {
+      // Extract phone number from href (tel:XXXXXXXXXX)
+      const phone = callLink.getAttribute('href')?.replace('tel:', '') || '';
+      
+      // Prepare tracking data
+      const trackingData = {
+        phone: phone,
+        targetID: targetID,
+        eventType: 'click',
+        zip: null // Can be enhanced later if zip is available
+      };
+
+      console.log('Tracking phone click:', trackingData);
+
+      const data = JSON.stringify(trackingData);
+      const endpoint = '/.netlify/functions/log-call';
+
+      // Use fetch with keepalive for reliable delivery (works better than sendBeacon for JSON)
+      fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: data,
+        keepalive: true // Ensures request completes even if page unloads
+      })
+        .then(response => {
+          if (!response.ok) {
+            console.error('Click tracking failed:', response.status, response.statusText);
+          } else {
+            return response.json().then(result => {
+              console.log('Click tracked successfully:', result);
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error tracking click:', error);
+          // Silently fail - don't block navigation
+        });
+    };
+
+    callLink.addEventListener('click', (e) => {
+      save();
+      trackPhoneClick(e);
+    }, { passive: true });
+    
     window.addEventListener('pagehide', save, { passive: true });
     window.addEventListener('pageshow', restore, { passive: true });
     document.addEventListener('visibilitychange', () => {
@@ -130,6 +193,17 @@ const formattedPhone = formatPhoneNumber(data.phone);
 
     // Initial load
     restore();
+    
+    console.log('CallCard script: Event listeners attached successfully');
+    };
+
+    // Run when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      // DOM already ready
+      init();
+    }
   })();
 </script>
 
