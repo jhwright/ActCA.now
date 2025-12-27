@@ -1,34 +1,24 @@
 // --- Netlify Serverless Function: log-call.js ---
 // Logs call actions and phone clicks to Google Sheets
 
-// Use dynamic imports to avoid module resolution issues in Netlify Functions
-let google;
+// Import google-auth-library directly for better serverless compatibility
+import { GoogleAuth } from 'google-auth-library';
+import { google } from 'googleapis';
 
 // --- Google Sheets Helper Functions ---
 async function getGoogleSheetsAuth() {
-  // Lazy load modules to avoid constructor errors
-  if (!google) {
-    try {
-      const googleapis = await import('googleapis');
-      google = googleapis.google;
-    } catch (importError) {
-      console.error('Error importing Google libraries:', importError);
-      throw new Error('Failed to load Google APIs: ' + importError.message);
-    }
-  }
-
   const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
   const serviceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
 
   // Support both service account JSON key (as string) or individual credentials
-  // Use GoogleAuth.fromJSON() for better compatibility with latest googleapis
+  // Use GoogleAuth from google-auth-library for better compatibility
   if (serviceAccountKey) {
     const keyData = typeof serviceAccountKey === 'string' 
       ? JSON.parse(serviceAccountKey) 
       : serviceAccountKey;
     
-    const auth = new google.auth.GoogleAuth({
+    const auth = new GoogleAuth({
       credentials: keyData,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
@@ -40,7 +30,7 @@ async function getGoogleSheetsAuth() {
       private_key: privateKey,
     };
     
-    const auth = new google.auth.GoogleAuth({
+    const auth = new GoogleAuth({
       credentials: credentials,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
@@ -93,12 +83,6 @@ async function appendToGoogleSheets(logData) {
     if (!auth) {
       console.warn('Google Sheets: Credentials not configured. Check GOOGLE_SERVICE_ACCOUNT_KEY or GOOGLE_SERVICE_ACCOUNT_EMAIL/GOOGLE_PRIVATE_KEY');
       return null;
-    }
-
-    // Ensure google is loaded (it should be from getGoogleSheetsAuth, but double-check)
-    if (!google) {
-      const googleapis = await import('googleapis');
-      google = googleapis.google;
     }
 
     const sheets = google.sheets({ version: 'v4', auth });
