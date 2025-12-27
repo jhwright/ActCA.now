@@ -16,29 +16,6 @@ const { call } = Astro.props;
 
 <BaseLayout title="Make Your Voice Heard!" description="Make Your Voice Heard!">
   <main class="min-h-screen p-6 bg-slate-900">
-    <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-      <a
-        href="/"
-        class="inline-flex items-center gap-2 px-4 py-2 text-yellow-400 hover:text-yellow-300 font-semibold bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
-      >
-        ← Back to Topics
-      </a>
-      <nav class="flex gap-3">
-        <a 
-          href="/suggestions"
-          class="text-yellow-400 hover:text-yellow-300 font-bold px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors text-base"
-        >
-          💡 Suggestions
-        </a>
-        <a 
-          href="/resources"
-          class="text-yellow-400 hover:text-yellow-300 font-bold px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors text-base"
-        >
-          📄 Resources
-        </a>
-      </nav>
-    </div>
-
     <CallCard call={call} targetID={call.id} />
   </main>
 </BaseLayout>
