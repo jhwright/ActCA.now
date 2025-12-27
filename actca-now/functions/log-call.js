@@ -3,7 +3,8 @@
 
 // Import google-auth-library directly for better serverless compatibility
 import { JWT } from 'google-auth-library';
-import { google } from 'googleapis';
+
+const SHEETS_API_BASE = 'https://sheets.googleapis.com/v4/spreadsheets';
 
 // --- Google Sheets Helper Functions ---
 async function getGoogleSheetsAuth() {
@@ -38,26 +39,71 @@ async function getGoogleSheetsAuth() {
   return null;
 }
 
+function buildUrl(base, path, query = {}) {
+  const url = new URL(base + path);
+  for (const [k, v] of Object.entries(query)) {
+    if (v === undefined || v === null) continue;
+    url.searchParams.set(k, String(v));
+  }
+  return url.toString();
+}
+
+async function sheetsFetch({ auth, method, path, query, body }) {
+  // Ensure the JWT has fetched tokens so requests include auth headers.
+  await auth.authorize();
+  const authHeaders = await auth.getRequestHeaders();
+
+  const res = await fetch(buildUrl(SHEETS_API_BASE, path, query), {
+    method,
+    headers: {
+      ...authHeaders,
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  const text = await res.text();
+  let json = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    // non-json response (rare)
+  }
+
+  if (!res.ok) {
+    const msg =
+      json?.error?.message ||
+      (typeof json?.message === 'string' ? json.message : null) ||
+      (text || `HTTP ${res.status}`);
+    const err = new Error(msg);
+    err.code = res.status;
+    err.response = { status: res.status, data: json || text };
+    throw err;
+  }
+
+  return json;
+}
+
 async function ensureSheetHeaders(sheets, spreadsheetId, sheetName) {
   try {
     // Check if sheet exists and has data
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `${sheetName}!A1:F1`,
+    const response = await sheetsFetch({
+      auth: sheets.auth,
+      method: 'GET',
+      path: `/${encodeURIComponent(spreadsheetId)}/values/${encodeURIComponent(`${sheetName}!A1:F1`)}`,
     });
 
-    const values = response.data.values;
+    const values = response?.values;
     
     // If sheet is empty or doesn't have headers, add them
     if (!values || values.length === 0) {
       const headers = ['timestamp', 'phone', 'targetID', 'eventType', 'zip', 'ip'];
-      await sheets.spreadsheets.values.update({
-        spreadsheetId,
-        range: `${sheetName}!A1:F1`,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: {
-          values: [headers],
-        },
+      await sheetsFetch({
+        auth: sheets.auth,
+        method: 'PUT',
+        path: `/${encodeURIComponent(spreadsheetId)}/values/${encodeURIComponent(`${sheetName}!A1:F1`)}`,
+        query: { valueInputOption: 'USER_ENTERED' },
+        body: { values: [headers] },
       });
     }
   } catch (error) {
@@ -83,11 +129,8 @@ async function appendToGoogleSheets(logData) {
       return null;
     }
 
-    // Ensure the JWT has fetched tokens so requests include auth headers.
-    // (Prevents confusing 401 "Login Required" errors when auth isn't attached.)
-    await auth.authorize();
-
-    const sheets = google.sheets({ version: 'v4', auth });
+    // We keep a lightweight "sheets" object for header initialization to reuse sheetsFetch().
+    const sheets = { auth };
     
     // Determine sheet name based on event type (or use default)
     const sheetName = process.env.GOOGLE_SHEETS_SHEET_NAME || 'Events';
@@ -108,17 +151,18 @@ async function appendToGoogleSheets(logData) {
     ];
 
     // Append row to sheet
-    const result = await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range: `${sheetName}!A:F`,
-      valueInputOption: 'USER_ENTERED',
-      insertDataOption: 'INSERT_ROWS',
-      requestBody: {
-        values: [rowData],
+    const result = await sheetsFetch({
+      auth,
+      method: 'POST',
+      path: `/${encodeURIComponent(spreadsheetId)}/values/${encodeURIComponent(`${sheetName}!A:F`)}:append`,
+      query: {
+        valueInputOption: 'USER_ENTERED',
+        insertDataOption: 'INSERT_ROWS',
       },
+      body: { values: [rowData] },
     });
 
-    console.log(`Google Sheets: Successfully appended row. Updated range: ${result.data.updates?.updatedRange || 'unknown'}`);
+    console.log(`Google Sheets: Successfully appended row. Updated range: ${result?.updates?.updatedRange || 'unknown'}`);
     return true;
   } catch (error) {
     console.error('Google Sheets: Error writing to sheet:', {
