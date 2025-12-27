@@ -17,10 +17,11 @@ async function getGoogleSheetsAuth() {
     const keyData = typeof serviceAccountKey === 'string' 
       ? JSON.parse(serviceAccountKey) 
       : serviceAccountKey;
+    const normalizedPrivateKey = keyData.private_key?.replace(/\\n/g, '\n');
     
     const auth = new JWT({
       email: keyData.client_email,
-      key: keyData.private_key,
+      key: normalizedPrivateKey,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
     
@@ -81,6 +82,10 @@ async function appendToGoogleSheets(logData) {
       console.warn('Google Sheets: Credentials not configured. Check GOOGLE_SERVICE_ACCOUNT_KEY or GOOGLE_SERVICE_ACCOUNT_EMAIL/GOOGLE_PRIVATE_KEY');
       return null;
     }
+
+    // Ensure the JWT has fetched tokens so requests include auth headers.
+    // (Prevents confusing 401 "Login Required" errors when auth isn't attached.)
+    await auth.authorize();
 
     const sheets = google.sheets({ version: 'v4', auth });
     
@@ -223,6 +228,9 @@ export const handler = async (event, context) => {
         message: `${type === 'click' ? 'Click' : 'Call'} logged successfully`,
         sheetsLogged: sheetsSuccess,
         sheetsError: sheetsError ? sheetsError.message : null,
+        sheetsErrorCode: sheetsError?.code ?? null,
+        sheetsErrorStatus: sheetsError?.response?.status ?? null,
+        deployedCommit: process.env.COMMIT_REF || process.env.HEAD || null,
         ...logData,
       }),
     };
