@@ -1,11 +1,24 @@
 // --- Netlify Serverless Function: log-call.js ---
 // Logs call actions and phone clicks to Google Sheets
 
-import { google } from 'googleapis';
-import { JWT } from 'google-auth-library';
+// Use dynamic imports to avoid module resolution issues in Netlify Functions
+let google, JWT;
 
 // --- Google Sheets Helper Functions ---
 async function getGoogleSheetsAuth() {
+  // Lazy load modules to avoid constructor errors
+  if (!google || !JWT) {
+    try {
+      const googleapis = await import('googleapis');
+      const authLibrary = await import('google-auth-library');
+      google = googleapis.google;
+      JWT = authLibrary.JWT;
+    } catch (importError) {
+      console.error('Error importing Google libraries:', importError);
+      throw new Error('Failed to load Google APIs: ' + importError.message);
+    }
+  }
+
   const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
   const serviceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
@@ -74,6 +87,12 @@ async function appendToGoogleSheets(logData) {
     if (!auth) {
       console.warn('Google Sheets: Credentials not configured. Check GOOGLE_SERVICE_ACCOUNT_KEY or GOOGLE_SERVICE_ACCOUNT_EMAIL/GOOGLE_PRIVATE_KEY');
       return null;
+    }
+
+    // Ensure google is loaded (it should be from getGoogleSheetsAuth, but double-check)
+    if (!google) {
+      const googleapis = await import('googleapis');
+      google = googleapis.google;
     }
 
     const sheets = google.sheets({ version: 'v4', auth });
