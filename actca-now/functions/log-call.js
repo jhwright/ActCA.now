@@ -22,23 +22,30 @@ async function getGoogleSheetsAuth() {
   const serviceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
 
   // Support both service account JSON key (as string) or individual credentials
-  // Use JWT client directly for better serverless function compatibility
-  // Access JWT from google.auth each time to avoid constructor issues
+  // Use GoogleAuth.fromJSON() for better compatibility with latest googleapis
   if (serviceAccountKey) {
     const keyData = typeof serviceAccountKey === 'string' 
       ? JSON.parse(serviceAccountKey) 
       : serviceAccountKey;
-    return new google.auth.JWT({
-      email: keyData.client_email,
-      key: keyData.private_key,
+    
+    const auth = new google.auth.GoogleAuth({
+      credentials: keyData,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
+    
+    return auth;
   } else if (serviceAccountEmail && privateKey) {
-    return new google.auth.JWT({
-      email: serviceAccountEmail,
-      key: privateKey,
+    const credentials = {
+      client_email: serviceAccountEmail,
+      private_key: privateKey,
+    };
+    
+    const auth = new google.auth.GoogleAuth({
+      credentials: credentials,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
+    
+    return auth;
   }
   return null;
 }
