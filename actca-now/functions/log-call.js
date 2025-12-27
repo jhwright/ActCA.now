@@ -2,17 +2,15 @@
 // Logs call actions and phone clicks to Google Sheets
 
 // Use dynamic imports to avoid module resolution issues in Netlify Functions
-let google, JWT;
+let google;
 
 // --- Google Sheets Helper Functions ---
 async function getGoogleSheetsAuth() {
   // Lazy load modules to avoid constructor errors
-  if (!google || !JWT) {
+  if (!google) {
     try {
       const googleapis = await import('googleapis');
       google = googleapis.google;
-      // JWT is part of googleapis, not a separate package
-      JWT = google.auth.JWT;
     } catch (importError) {
       console.error('Error importing Google libraries:', importError);
       throw new Error('Failed to load Google APIs: ' + importError.message);
@@ -25,17 +23,18 @@ async function getGoogleSheetsAuth() {
 
   // Support both service account JSON key (as string) or individual credentials
   // Use JWT client directly for better serverless function compatibility
+  // Access JWT from google.auth each time to avoid constructor issues
   if (serviceAccountKey) {
     const keyData = typeof serviceAccountKey === 'string' 
       ? JSON.parse(serviceAccountKey) 
       : serviceAccountKey;
-    return new JWT({
+    return new google.auth.JWT({
       email: keyData.client_email,
       key: keyData.private_key,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
   } else if (serviceAccountEmail && privateKey) {
-    return new JWT({
+    return new google.auth.JWT({
       email: serviceAccountEmail,
       key: privateKey,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
