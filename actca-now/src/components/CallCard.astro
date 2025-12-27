@@ -10,8 +10,6 @@ interface Props {
 
 const { call, targetID } = Astro.props;
 const { data } = call;
-const photoPath = `/officials/${call.id}.jpg`;
-const placeholderImage = '/officials/placeholder.svg';
 
 // Format phone number as (xxx) xxx-xxxx
 function formatPhoneNumber(phone: string): string {
@@ -42,17 +40,9 @@ const formattedPhone = formatPhoneNumber(data.phone);
       </div>
     )}
     
-    <!-- Official Photo and Info -->
-    <div class="flex items-start gap-4 mb-4">
-      <img 
-        src={photoPath} 
-        alt={`${data.officialName}`}
-        class="w-20 h-20 rounded-full object-cover border-2 border-yellow-400"
-        onerror={`this.onerror=null; this.src='${placeholderImage}'; this.style.display='none';`}
-      />
-      <div class="flex-1">
-        <h3 class="text-xl font-bold text-yellow-400 mb-1">{data.officialName}, {data.officialTitle}</h3>
-      </div>
+    <!-- Official Info -->
+    <div class="mb-4">
+      <h3 class="text-xl font-bold text-yellow-400 mb-1">{data.officialName}, {data.officialTitle}</h3>
     </div>
   </div>
   
