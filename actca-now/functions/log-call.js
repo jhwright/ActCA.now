@@ -2,7 +2,7 @@
 // Logs call actions and phone clicks to Google Sheets
 
 // Import google-auth-library directly for better serverless compatibility
-import { GoogleAuth } from 'google-auth-library';
+import { JWT } from 'google-auth-library';
 import { google } from 'googleapis';
 
 // --- Google Sheets Helper Functions ---
@@ -12,26 +12,23 @@ async function getGoogleSheetsAuth() {
   const serviceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
 
   // Support both service account JSON key (as string) or individual credentials
-  // Use GoogleAuth from google-auth-library for better compatibility
+  // Use JWT directly from google-auth-library for service account authentication
   if (serviceAccountKey) {
     const keyData = typeof serviceAccountKey === 'string' 
       ? JSON.parse(serviceAccountKey) 
       : serviceAccountKey;
     
-    const auth = new GoogleAuth({
-      credentials: keyData,
+    const auth = new JWT({
+      email: keyData.client_email,
+      key: keyData.private_key,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
     
     return auth;
   } else if (serviceAccountEmail && privateKey) {
-    const credentials = {
-      client_email: serviceAccountEmail,
-      private_key: privateKey,
-    };
-    
-    const auth = new GoogleAuth({
-      credentials: credentials,
+    const auth = new JWT({
+      email: serviceAccountEmail,
+      key: privateKey,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
     
@@ -79,14 +76,12 @@ async function appendToGoogleSheets(logData) {
   }
 
   try {
-    const googleAuth = await getGoogleSheetsAuth();
-    if (!googleAuth) {
+    const auth = await getGoogleSheetsAuth();
+    if (!auth) {
       console.warn('Google Sheets: Credentials not configured. Check GOOGLE_SERVICE_ACCOUNT_KEY or GOOGLE_SERVICE_ACCOUNT_EMAIL/GOOGLE_PRIVATE_KEY');
       return null;
     }
 
-    // Get the authorized client from GoogleAuth
-    const auth = await googleAuth.getClient();
     const sheets = google.sheets({ version: 'v4', auth });
     
     // Determine sheet name based on event type (or use default)
