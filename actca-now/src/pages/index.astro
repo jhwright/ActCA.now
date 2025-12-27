@@ -8,22 +8,20 @@ const allCalls = await getCollection('calls');
 ---
 
 <BaseLayout>
-  <main class="relative min-h-screen bg-white">
+  <main class="relative min-h-screen bg-slate-900">
     <!-- Header - Top Right -->
     <header class="absolute top-8 right-8 flex flex-col items-end gap-4 z-50">
-      <h1 class="text-2xl font-bold text-black">Make Your Voice Heard!</h1>
+      <h1 class="text-2xl font-bold text-yellow-400">Make Your Voice Heard!</h1>
       <nav class="flex gap-4 text-lg">
         <a 
           href="/suggestions"
-          class="text-black hover:text-slate-700 font-bold underline bg-yellow-100 px-3 py-1 rounded"
-          style="color: #000 !important;"
+          class="text-yellow-400 hover:text-yellow-300 font-bold px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
         >
           💡 Suggestions
         </a>
         <a 
           href="/resources"
-          class="text-black hover:text-slate-700 font-bold underline bg-yellow-100 px-3 py-1 rounded"
-          style="color: #000 !important;"
+          class="text-yellow-400 hover:text-yellow-300 font-bold px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
         >
           📄 Resources
         </a>
@@ -48,9 +46,9 @@ const allCalls = await getCollection('calls');
 
             return (
               <tr class="topic-row">
-                <td class="p-0" style="border-width: 2px;">
+                <td class="p-0">
                   <a
-                    class="topic-row-button w-full font-bold text-lg border-2 border-black bg-white text-black p-[3px] text-center transition-colors block"
+                    class="topic-row-button w-full font-bold text-lg border-2 border-yellow-400 bg-slate-800 text-yellow-400 p-3 text-center transition-colors block rounded-lg hover:bg-slate-700"
                     href={`/call/${call.id}/`}
                   >
                     {topicLabel}

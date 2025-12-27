@@ -29,19 +29,19 @@
 
 /* Desktop hover */
 .topic-table-container table tbody tr.topic-row:hover .topic-row-button {
-  background-color: #e5e7eb !important; /* gray-200 */
+  background-color: rgb(51 65 85) !important; /* slate-700 */
 }
 
 /* Mobile tap / click */
 .topic-table-container table tbody tr.topic-row:active .topic-row-button,
 .topic-table-container table tbody tr.topic-row .topic-row-button:active {
-  background-color: #d1d5db !important; /* gray-300 */
+  background-color: rgb(71 85 105) !important; /* slate-600 */
 }
 
 /* Keyboard accessibility */
 .topic-table-container table tbody tr.topic-row .topic-row-button:focus-visible {
-  background-color: #e5e7eb !important; /* gray-200 */
-  outline: 2px solid #111827; /* slate-900 */
+  background-color: rgb(51 65 85) !important; /* slate-700 */
+  outline: 2px solid #facc15; /* yellow-400 */
   outline-offset: -2px;
 }
 
@@ -91,13 +91,9 @@
   padding-bottom: 0.25rem;
 }
 
-/* Force light mode colors - override any browser dark mode and Safari overrides */
+/* Force dark mode colors - ensure consistency across browsers */
 .text-white {
   color: #fff !important;
-}
-
-.text-black {
-  color: #000 !important;
 }
 
 .text-yellow-400 {
@@ -108,12 +104,8 @@
   color: #cbd5e1 !important;
 }
 
-.text-slate-700 {
-  color: #334155 !important;
-}
-
-.bg-white {
-  background-color: #fff !important;
+.text-slate-400 {
+  color: #94a3b8 !important;
 }
 
 .bg-slate-900 {
@@ -128,7 +120,7 @@
   background-color: rgb(51 65 85) !important;
 }
 
-/* Safari-specific: Force colors on light mode */
+/* Safari-specific: Force colors in dark mode */
 @supports (-webkit-hyphens:none) {
   [data-call-card] .text-yellow-400 {
     color: #facc15 !important;
@@ -144,18 +136,5 @@
     color: #cbd5e1 !important;
     -webkit-text-fill-color: #cbd5e1 !important;
   }
-}
-
-/* Ensure navigation links are visible and clickable */
-nav a {
-  color: #000 !important;
-  text-decoration: underline !important;
-  font-weight: 600 !important;
-  z-index: 100;
-  position: relative;
-}
-
-nav a:hover {
-  color: #334155 !important;
 }
 
