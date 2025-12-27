@@ -1,10 +1,10 @@
 ---
 topic: "rights"
-officialName: "James Thompson"
-officialTitle: "Civil Rights Director"
-phone: "9165554567"
-script: "I'm calling to demand you support the California Civil Rights Protection Act, Senate Bill 2468. I am a California voter in zip code [ZIP]. We need state legislation guaranteeing reproductive rights, LGBTQ+ protections, immigrant rights, and voting access regardless of federal policy changes. Support SB 2468 to establish California as a sanctuary for civil liberties. Our residents' safety and fundamental rights depend on this. Vote yes on the Civil Rights Protection Act now. Thank you."
+officialName: "Kevin Kish"
+officialTitle: "Director, California Civil Rights Department"
+phone: "9164787251"
+script: "I'm calling to urge Director Kish to strengthen California's position as a sanctuary for civil liberties and fundamental rights. As a voter in zip code [ZIP], I believe our state must lead the defense of reproductive freedom, LGBTQ+ equality, and voting access. Please champion the implementation of state-controlled protections that remain independent of federal shifts. We must ensure that every Californian is protected under our own robust legal framework. I support measures like SB 1174 that safeguard our democracy and protect our diverse communities from outside interference. Thank you."
 priority: false
-rationale: "California's progressive civil rights framework protects millions of residents from discrimination and ensures access to fundamental liberties. State-level rights protections create a legal firewall against federal policy changes that could strip away protections for vulnerable communities, ensuring California remains a beacon of equality and justice."
+rationale: "California's Civil Rights Department (formerly DFEH) is the first line of defense in protecting the rights and dignity of all Californians. As federal protections for reproductive rights and voting access are challenged, California must assert its sovereignty to codify and enforce its own higher standards. Strengthening state-level protections ensures that fundamental rights like marriage equality, bodily autonomy, and equal opportunity remain ironclad in California. By leading with a comprehensive civil rights framework, our state demonstrates that we can protect our residents independently, serving as a model for liberty and equality in 2025 and beyond."
 ---
 

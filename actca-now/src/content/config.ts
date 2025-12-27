@@ -4,7 +4,7 @@ import { glob } from 'astro/loaders';
 const calls = defineCollection({
   loader: glob({ pattern: '**/[^_]*.md', base: "./src/content/calls" }),
   schema: z.object({
-    topic: z.enum(['rail', 'housing', 'water', 'health', 'rights', 'econ']),
+    topic: z.enum(['rail', 'housing', 'water', 'health', 'rights', 'econ', 'climate', 'energy', 'education']),
     officialName: z.string(),
     officialTitle: z.string(),
     phone: z.string(),

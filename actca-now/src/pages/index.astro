@@ -18,10 +18,13 @@ const allCalls = await getCollection('calls');
             const topicLabels = {
               rail: 'High Speed Rail - NOW',
               housing: 'YIMBY - Housing',
-              water: 'Water',
-              health: 'Healthcare for Californians',
+              water: 'Water Sovereignty',
+              health: 'Universal Healthcare',
               rights: 'Rights - Fight I.C.E.',
               econ: 'CA $ for CA',
+              climate: 'Climate Action',
+              energy: 'Energy Independence',
+              education: 'Education Autonomy',
             } as const;
             const topicLabel = topicLabels[topicValue] ?? topicValue;
 

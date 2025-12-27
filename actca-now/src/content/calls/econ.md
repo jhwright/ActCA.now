@@ -1,10 +1,10 @@
 ---
 topic: "econ"
-officialName: "Lisa Park"
-officialTitle: "Economic Development Director"
-phone: "9165555678"
-script: "I'm calling to demand you support the California Economic Independence Act, Assembly Bill 1122. I am a California voter in zip code [ZIP]. We need California-first economic policies that keep our tax dollars working for Californians instead of being redistributed to other states. Support AB 1122 to prioritize California businesses, workers, and communities in all economic decisions. Our state contributes more to federal coffers than we receive back. Vote yes on economic independence now. Thank you."
+officialName: "Dee Dee Myers"
+officialTitle: "Director, Governor's Office of Business and Economic Development (GO-Biz)"
+phone: "9163221394"
+script: "I'm calling to urge Director Myers to prioritize the California Economic Independence initiative. As a voter in zip code [ZIP], I believe our tax dollars should stay in California to support our own businesses, workers, and infrastructure. We must reduce our reliance on federal redistribution and prioritize in-state procurement for state contracts. Please support the expansion of the California Infrastructure Bank and other measures that keep our capital working for Californians. Our state's economic strength should serve the needs of our own communities first. Thank you."
 priority: false
-rationale: "California generates massive economic output but receives less federal funding per dollar contributed than most states. California-first economic policies ensure that our state's resources are invested in California businesses, infrastructure, and communities rather than being redistributed to other states, building long-term economic independence and prosperity."
+rationale: "California's economy is the 5th largest in the world, yet we often receive less back in federal spending than we contribute in taxes. By prioritizing the California Infrastructure and Economic Development Bank (IBank) and state-controlled economic funds, we can ensure our wealth stays within our borders to benefit our communities. Economic independence means prioritizing California-based businesses for state contracts and investing in our own innovation hubs. GO-Biz is uniquely positioned to lead this 'California First' economic strategy, reducing our vulnerability to federal economic shifts and ensuring that the prosperity generated in California serves the needs of all Californians first."
 ---
 
