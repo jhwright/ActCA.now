@@ -79,12 +79,14 @@ async function appendToGoogleSheets(logData) {
   }
 
   try {
-    const auth = await getGoogleSheetsAuth();
-    if (!auth) {
+    const googleAuth = await getGoogleSheetsAuth();
+    if (!googleAuth) {
       console.warn('Google Sheets: Credentials not configured. Check GOOGLE_SERVICE_ACCOUNT_KEY or GOOGLE_SERVICE_ACCOUNT_EMAIL/GOOGLE_PRIVATE_KEY');
       return null;
     }
 
+    // Get the authorized client from GoogleAuth
+    const auth = await googleAuth.getClient();
     const sheets = google.sheets({ version: 'v4', auth });
     
     // Determine sheet name based on event type (or use default)
