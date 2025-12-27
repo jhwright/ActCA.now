@@ -2,6 +2,7 @@
 // Logs call actions and phone clicks to Google Sheets
 
 import { google } from 'googleapis';
+import { JWT } from 'google-auth-library';
 
 // --- Google Sheets Helper Functions ---
 async function getGoogleSheetsAuth() {
@@ -10,20 +11,20 @@ async function getGoogleSheetsAuth() {
   const serviceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
 
   // Support both service account JSON key (as string) or individual credentials
+  // Use JWT client directly for better serverless function compatibility
   if (serviceAccountKey) {
     const keyData = typeof serviceAccountKey === 'string' 
       ? JSON.parse(serviceAccountKey) 
       : serviceAccountKey;
-    return new google.auth.GoogleAuth({
-      credentials: keyData,
+    return new JWT({
+      email: keyData.client_email,
+      key: keyData.private_key,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
   } else if (serviceAccountEmail && privateKey) {
-    return new google.auth.GoogleAuth({
-      credentials: {
-        client_email: serviceAccountEmail,
-        private_key: privateKey,
-      },
+    return new JWT({
+      email: serviceAccountEmail,
+      key: privateKey,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
   }
