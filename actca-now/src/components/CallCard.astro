@@ -50,7 +50,7 @@ const formattedPhone = formatPhoneNumber(data.phone);
   <div class="flex-1 overflow-y-auto px-6 pb-4" data-call-scroll>
     <!-- Script (sticky so it stays visible while you scroll on mobile) -->
     <div class="call-script-sticky mb-4">
-      <p class="text-white text-lg font-semibold leading-relaxed">{data.script}</p>
+      <p class="text-white text-lg font-semibold leading-relaxed" data-call-script>{data.script}</p>
     </div>
     
     <!-- No-JS rationale toggle -->
@@ -99,11 +99,13 @@ const formattedPhone = formatPhoneNumber(data.phone);
 
       const scrollEl = card.querySelector('[data-call-scroll]');
       const callLink = card.querySelector('.js-call-cta');
+      const scriptEl = card.querySelector('[data-call-script]');
       const targetID = card.getAttribute('data-target-id') || 'unknown';
       
       console.log('CallCard script: Elements found:', {
         scrollEl: !!scrollEl,
         callLink: !!callLink,
+        scriptEl: !!scriptEl,
         targetID: targetID
       });
       
@@ -113,6 +115,7 @@ const formattedPhone = formatPhoneNumber(data.phone);
       }
 
     const key = `actca:callScroll:${targetID}`;
+    const zipKey = 'actca:zip';
 
     const save = () => {
       try {
@@ -130,8 +133,84 @@ const formattedPhone = formatPhoneNumber(data.phone);
       } catch {}
     };
 
+    const normalizeZip = (input) => {
+      if (typeof input !== 'string') return null;
+      const trimmed = input.trim();
+      if (!trimmed) return null;
+      const digits = trimmed.replace(/\D/g, '');
+      if (digits.length === 5) return digits;
+      if (digits.length === 9) return `${digits.slice(0, 5)}-${digits.slice(5)}`;
+      return null;
+    };
+
+    const getStoredZip = () => {
+      try {
+        const raw = localStorage.getItem(zipKey);
+        return normalizeZip(raw);
+      } catch {
+        return null;
+      }
+    };
+
+    const setStoredZip = (zip) => {
+      try {
+        if (!zip) return;
+        localStorage.setItem(zipKey, zip);
+      } catch {}
+    };
+
+    const applyZipToScript = (zip) => {
+      if (!scriptEl) return;
+      if (!zip) return;
+      try {
+        const current = scriptEl.textContent || '';
+        // Replace common placeholder patterns.
+        const updated = current.replace(/\[ZIP\]/g, zip).replace(/\{\{ZIP\}\}/g, zip);
+        if (updated !== current) scriptEl.textContent = updated;
+      } catch {}
+    };
+
+    const promptForZipIfMissing = () => {
+      const existing = getStoredZip();
+      if (existing) return existing;
+
+      // In some environments (automated browsers, hardened privacy settings),
+      // prompt/alert may be blocked or unsupported. In that case, just proceed.
+      if (typeof window.prompt !== 'function') return null;
+
+      // Optional, but asked at click-time for user intent/accuracy.
+      // Allow cancel/blank to proceed without a ZIP.
+      let zip = null;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        let input = null;
+        try {
+          input = window.prompt('Enter your ZIP code (optional):', '');
+        } catch {
+          return null;
+        }
+        if (input == null) return null; // user cancelled
+        const normalized = normalizeZip(input);
+        if (!input.trim()) return null; // blank = skip
+        if (normalized) {
+          zip = normalized;
+          break;
+        }
+        try {
+          window.alert('Please enter a valid 5-digit ZIP code (or ZIP+4), or leave blank.');
+        } catch {
+          return null;
+        }
+      }
+
+      if (zip) setStoredZip(zip);
+      return zip;
+    };
+
+    // If we already have a ZIP, immediately personalize the script text.
+    applyZipToScript(getStoredZip());
+
     // Track phone number clicks
-    const trackPhoneClick = (e) => {
+    const trackPhoneClick = (zip) => {
       // Extract phone number from href (tel:XXXXXXXXXX)
       const phone = callLink.getAttribute('href')?.replace('tel:', '') || '';
       
@@ -140,7 +219,7 @@ const formattedPhone = formatPhoneNumber(data.phone);
         phone: phone,
         targetID: targetID,
         eventType: 'click',
-        zip: null // Can be enhanced later if zip is available
+        zip: zip || null
       };
 
       console.log('Tracking phone click:', trackingData);
@@ -172,8 +251,28 @@ const formattedPhone = formatPhoneNumber(data.phone);
 
     callLink.addEventListener('click', (e) => {
       save();
-      trackPhoneClick(e);
-    }, { passive: true });
+      const existingZip = getStoredZip();
+      if (existingZip) {
+        applyZipToScript(existingZip);
+        trackPhoneClick(existingZip);
+        return; // let default navigation to tel: happen
+      }
+
+      // Need to ask for ZIP; prevent navigation until prompt completes.
+      e.preventDefault();
+      const href = callLink.getAttribute('href');
+      let zip = null;
+      try {
+        zip = promptForZipIfMissing();
+        if (zip) applyZipToScript(zip);
+      } catch (err) {
+        console.warn('ZIP prompt failed; continuing without ZIP.', err);
+      }
+      trackPhoneClick(zip);
+
+      // Continue to dialer even if prompting/tracking fails.
+      if (href) window.location.href = href;
+    }, { passive: false });
     
     window.addEventListener('pagehide', save, { passive: true });
     window.addEventListener('pageshow', restore, { passive: true });
