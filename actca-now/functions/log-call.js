@@ -10,9 +10,9 @@ async function getGoogleSheetsAuth() {
   if (!google || !JWT) {
     try {
       const googleapis = await import('googleapis');
-      const authLibrary = await import('google-auth-library');
       google = googleapis.google;
-      JWT = authLibrary.JWT;
+      // JWT is part of googleapis, not a separate package
+      JWT = google.auth.JWT;
     } catch (importError) {
       console.error('Error importing Google libraries:', importError);
       throw new Error('Failed to load Google APIs: ' + importError.message);
