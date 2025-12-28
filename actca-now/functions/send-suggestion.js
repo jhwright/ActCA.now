@@ -149,14 +149,14 @@ async function appendSuggestionToGoogleSheets(suggestionData) {
   // If no credentials configured, skip Google Sheets integration
   if (!spreadsheetId) {
     console.warn('Google Sheets: Spreadsheet ID not configured (GOOGLE_SHEETS_SPREADSHEET_ID)');
-    return null;
+    return { success: false, error: 'Not configured' };
   }
 
   try {
     const auth = await getGoogleSheetsAuth();
     if (!auth) {
       console.warn('Google Sheets: Credentials not configured. Check GOOGLE_SERVICE_ACCOUNT_KEY or GOOGLE_SERVICE_ACCOUNT_EMAIL/GOOGLE_PRIVATE_KEY');
-      return null;
+      return { success: false, error: 'Credentials not configured' };
     }
 
     // We keep a lightweight "sheets" object for header initialization to reuse sheetsFetch().
@@ -192,14 +192,15 @@ async function appendSuggestionToGoogleSheets(suggestionData) {
     });
 
     console.log(`Google Sheets: Successfully appended suggestion. Updated range: ${result?.updates?.updatedRange || 'unknown'}`);
-    return true;
+    return { success: true };
   } catch (error) {
     console.error('Google Sheets: Error writing suggestion to sheet:', {
       message: error.message,
       code: error.code,
       details: error.response?.data || error.stack,
     });
-    throw error;
+    // Return error info instead of throwing - don't fail the whole request
+    return { success: false, error: error.message, code: error.code };
   }
 }
 
@@ -272,30 +273,26 @@ export const handler = async (event, context) => {
       timestamp: suggestionData.timestamp,
     });
 
-    // Write to Google Sheets (if configured)
-    let sheetsSuccess = false;
-    let sheetsError = null;
+    // Write to Google Sheets (if configured) - wrapped in its own try-catch for safety
+    let sheetsResult = { success: false, error: 'Not attempted' };
     try {
       console.log('Attempting to write suggestion to Google Sheets...');
-      const result = await appendSuggestionToGoogleSheets(suggestionData);
-      sheetsSuccess = result === true;
-      if (result === null) {
-        console.warn('Google Sheets: Integration skipped (not configured or credentials missing)');
-      } else {
+      sheetsResult = await appendSuggestionToGoogleSheets(suggestionData);
+      if (sheetsResult.success) {
         console.log('Successfully wrote suggestion to Google Sheets');
+      } else {
+        console.warn('Google Sheets: Write did not succeed:', sheetsResult.error);
       }
     } catch (error) {
-      // Log error but don't fail the request
-      sheetsError = error;
-      console.error('Google Sheets: Write failed (continuing anyway):', {
-        message: error.message,
-        code: error.code,
-        status: error.response?.status,
-        details: error.response?.data,
+      // Extra safety catch - should not be reached with new return pattern
+      console.error('Google Sheets: Unexpected error (continuing anyway):', {
+        message: error?.message,
+        code: error?.code,
       });
+      sheetsResult = { success: false, error: error?.message || 'Unknown error' };
     }
 
-    // Success response
+    // Always return success to the user - their suggestion was received
     return {
       statusCode: 200,
       headers: {
@@ -307,10 +304,9 @@ export const handler = async (event, context) => {
       body: JSON.stringify({
         success: true,
         message: 'Suggestion received successfully',
-        sheetsLogged: sheetsSuccess,
-        sheetsError: sheetsError ? sheetsError.message : null,
-        sheetsErrorCode: sheetsError?.code ?? null,
-        sheetsErrorStatus: sheetsError?.response?.status ?? null,
+        sheetsLogged: sheetsResult.success,
+        sheetsError: sheetsResult.success ? null : (sheetsResult.error || null),
+        sheetsErrorCode: sheetsResult.success ? null : (sheetsResult.code || null),
       }),
     };
   } catch (error) {
