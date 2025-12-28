@@ -1,5 +1,5 @@
 ---
-topic: "water"
+title: "Water Sovereignty"
 officialName: "E. Joaquin Esquivel"
 officialTitle: "Chair, State Water Resources Control Board"
 phone: "9163415250"

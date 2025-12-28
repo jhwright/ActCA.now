@@ -1,5 +1,5 @@
 ---
-topic: "rights"
+title: "Rights - Fight I.C.E."
 officialName: "Kevin Kish"
 officialTitle: "Director, California Civil Rights Department"
 phone: "9164787251"

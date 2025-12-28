@@ -1,5 +1,5 @@
 ---
-topic: "housing"
+title: "YIMBY - Housing"
 officialName: "Gustavo Velasquez"
 officialTitle: "Director, California Department of Housing and Community Development"
 phone: "9162632771"

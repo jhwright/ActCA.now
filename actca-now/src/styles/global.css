@@ -1,140 +1,17 @@
 @import "tailwindcss";
+@import "flowbite";
 
-.main-title {
-  font-size: 2rem;
-  font-weight: bold;
-  font-family: sans-serif;
-  text-align: center;
-}
-
-.scripty-text {
-  font-family: 'Dancing Script', cursive;
-  font-weight: 700;
-  font-size: 4rem;
-  text-align: center;
-}
-
-/* Table row hover effect for Safari compatibility */
-.topic-table-container table tbody tr {
-  cursor: pointer;
-  -webkit-transition: background-color 0.2s ease;
-  transition: background-color 0.2s ease;
-}
-
-.topic-table-container table tbody tr.topic-row {
-  cursor: pointer;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Desktop hover */
-.topic-table-container table tbody tr.topic-row:hover .topic-row-button {
-  background-color: rgb(51 65 85) !important; /* slate-700 */
-}
-
-/* Mobile tap / click */
-.topic-table-container table tbody tr.topic-row:active .topic-row-button,
-.topic-table-container table tbody tr.topic-row .topic-row-button:active {
-  background-color: rgb(71 85 105) !important; /* slate-600 */
-}
-
-/* Keyboard accessibility */
-.topic-table-container table tbody tr.topic-row .topic-row-button:focus-visible {
-  background-color: rgb(51 65 85) !important; /* slate-700 */
-  outline: 2px solid #facc15; /* yellow-400 */
-  outline-offset: -2px;
-}
-
-.topic-table-container table tbody tr td {
-  -webkit-transition: background-color 0.2s ease;
-  transition: background-color 0.2s ease;
-}
-
-.topic-table-container table tbody tr td .topic-row-button {
-  display: block;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-/* Call-to-action button: explicit (non-Tailwind) styling for max Safari compatibility */
-.call-cta {
-  background: linear-gradient(180deg, #fde047 0%, #facc15 100%);
-  color: #0f172a;
-  border: 4px solid #ca8a04;
-  box-shadow:
-    0 10px 15px -3px rgba(0, 0, 0, 0.25),
-    0 4px 6px -4px rgba(0, 0, 0, 0.25);
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-}
-
-.call-cta:hover {
-  background: linear-gradient(180deg, #fef08a 0%, #fde047 100%);
-}
-
-.call-cta:active {
-  transform: scale(0.98);
-}
-
-.call-cta:focus-visible {
-  outline: 4px solid rgba(250, 204, 21, 0.7);
-  outline-offset: 2px;
-}
-
-/* Keep the call script visible while scrolling the call card (especially on mobile). */
-.call-script-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: rgb(15 23 42); /* slate-900 */
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
-
-/* Force dark mode colors - ensure consistency across browsers */
-.text-white {
+/* Override Flowbite form input defaults for dark theme */
+input[type="text"],
+input[type="email"],
+textarea {
+  background-color: #1e293b !important;
   color: #fff !important;
 }
 
-.text-yellow-400 {
-  color: #facc15 !important;
-}
-
-.text-slate-300 {
-  color: #cbd5e1 !important;
-}
-
-.text-slate-400 {
-  color: #94a3b8 !important;
-}
-
-.bg-slate-900 {
-  background-color: rgb(15 23 42) !important;
-}
-
-.bg-slate-800 {
-  background-color: rgb(30 41 59) !important;
-}
-
-.bg-slate-700 {
-  background-color: rgb(51 65 85) !important;
-}
-
-/* Safari-specific: Force colors in dark mode */
-@supports (-webkit-hyphens:none) {
-  [data-call-card] .text-yellow-400 {
-    color: #facc15 !important;
-    -webkit-text-fill-color: #facc15 !important;
-  }
-  
-  [data-call-card] .text-white {
-    color: #fff !important;
-    -webkit-text-fill-color: #fff !important;
-  }
-  
-  [data-call-card] .text-slate-300 {
-    color: #cbd5e1 !important;
-    -webkit-text-fill-color: #cbd5e1 !important;
-  }
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+textarea::placeholder {
+  color: #64748b !important;
 }
 

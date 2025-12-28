@@ -7,27 +7,99 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   title="Suggestions - Make Your Voice Heard!"
   description="Share your suggestions and ideas"
 >
-  <main class="container mx-auto px-4 py-8 max-w-2xl">
-    <!-- Header -->
-    <header class="mb-8 text-center">
-      <h1 class="text-4xl font-bold text-yellow-400 mb-4">Suggestions</h1>
-      <p class="text-xl text-slate-300 mb-2">Share Your Ideas</p>
-      <p class="text-slate-400">Help us improve ActCA.now</p>
+  <main class="flex flex-col h-[calc(100vh-5rem)] mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-4xl lg:max-w-5xl">
+    <!-- Fixed Header Section - stays visible, doesn't scroll -->
+    <header class="flex-shrink-0 mb-8 text-center">
+      <h1 class="text-3xl sm:text-4xl font-bold text-yellow-400 mb-4">Suggestions</h1>
+      <p class="text-lg sm:text-xl text-slate-300 mb-2">Share Your Ideas</p>
+      <p class="text-base sm:text-lg text-slate-400">Help us improve ActUp.Now</p>
     </header>
+
+    <!-- Scrollable Content Container - positioned below header, scrolls independently -->
+    <div class="flex-1 overflow-y-auto min-h-0">
+      <!-- Content Guide Accordion -->
+      <div class="mb-6 bg-slate-900 border border-yellow-400 rounded-2xl shadow-xl">
+      <div id="accordion-content-guide" data-accordion="collapse" data-active-classes="bg-slate-800">
+        <h2 id="accordion-content-guide-heading">
+          <button 
+            type="button"
+            class="flex items-center justify-between w-full min-h-[56px] sm:min-h-[64px] px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base md:text-lg font-bold text-yellow-400 bg-slate-800 border border-yellow-400 rounded-t-2xl hover:bg-slate-700 focus:ring-4 focus:ring-yellow-400 focus:outline-none transition-colors gap-2"
+            data-accordion-target="#accordion-content-guide-body"
+            aria-expanded="false"
+            aria-controls="accordion-content-guide-body"
+          >
+            <span class="text-left flex-shrink-0 pr-2">📝 Content File Formatting Guide</span>
+            <svg data-accordion-icon class="w-4 h-4 sm:w-5 sm:h-5 rotate-180 shrink-0 flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+            </svg>
+          </button>
+        </h2>
+        <div 
+          id="accordion-content-guide-body" 
+          class="hidden"
+          aria-labelledby="accordion-content-guide-heading"
+        >
+          <div class="p-4 sm:p-6 prose prose-invert max-w-none overflow-x-auto">
+            <div class="text-sm sm:text-base text-slate-300 space-y-4">
+              <h3 class="text-lg sm:text-xl font-bold text-yellow-400 mb-3">Creating Content Files</h3>
+              
+              <p>You can submit new call actions by uploading a properly formatted markdown (`.md`) file. Here's what you need to know:</p>
+              
+              <h4 class="text-base sm:text-lg font-semibold text-yellow-400 mt-4 mb-2">Required Fields</h4>
+              <ul class="list-disc list-inside space-y-2 ml-2">
+                <li><strong>title</strong> - Display name shown on the index page</li>
+                <li><strong>officialName</strong> - Full name of the official</li>
+                <li><strong>officialTitle</strong> - Official's job title or position</li>
+                <li><strong>phone</strong> - Phone number (digits only, e.g., "9163222990")</li>
+                <li><strong>script</strong> - The call script (use [ZIP] for zip code placeholder)</li>
+                <li><strong>rationale</strong> - Detailed explanation of why this call is important</li>
+              </ul>
+              
+              <h4 class="text-base sm:text-lg font-semibold text-yellow-400 mt-4 mb-2">Optional Fields</h4>
+              <ul class="list-disc list-inside space-y-2 ml-2">
+                <li><strong>priority</strong> - Set to <code class="bg-slate-800 px-1 rounded">true</code> to mark as urgent (default: <code class="bg-slate-800 px-1 rounded">false</code>)</li>
+              </ul>
+              
+              <h4 class="text-base sm:text-lg font-semibold text-yellow-400 mt-4 mb-2">Example Format</h4>
+              <pre class="bg-slate-800 p-3 sm:p-4 rounded-lg overflow-x-auto text-xs sm:text-sm"><code>---
+title: "Climate Action"
+officialName: "Liane Randolph"
+officialTitle: "Chair, California Air Resources Board"
+phone: "9163222990"
+script: "I'm calling to urge Chair Randolph... As a voter in zip code [ZIP]..."
+priority: false
+rationale: "California's climate leadership is essential..."
+---</code></pre>
+              
+              <div class="mt-4 p-3 bg-slate-800 rounded-lg border border-yellow-400/30">
+                <p class="text-yellow-400 font-semibold mb-1">💡 Tips:</p>
+                <ul class="list-disc list-inside space-y-1 ml-2 text-sm">
+                  <li>All string values must be wrapped in double quotes</li>
+                  <li>Phone numbers should contain only digits (no dashes or parentheses)</li>
+                  <li>Use <code class="bg-slate-700 px-1 rounded">[ZIP]</code> in the script to automatically insert the user's zip code</li>
+                  <li>Choose a descriptive filename (e.g., <code class="bg-slate-700 px-1 rounded">climate.md</code>)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     
     <!-- Suggestion Form -->
-    <div class="bg-slate-900 rounded-2xl border-2 border-slate-800 p-8 mb-6 shadow-xl">
+    <div class="p-4 sm:p-6 md:p-8 mb-6 bg-slate-900 border border-yellow-400 rounded-2xl shadow-xl">
       <form 
         id="suggestion-form"
         class="space-y-6"
         method="POST"
         action="/.netlify/functions/send-suggestion"
+        autocomplete="off"
       >
         <!-- Name Field -->
         <div>
           <label 
             for="name" 
-            class="block text-base font-bold text-yellow-400 mb-3"
+            class="block mb-3 text-base font-bold text-yellow-400"
           >
             Name (optional)
           </label>
@@ -35,7 +107,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             type="text"
             id="name"
             name="name"
-            class="w-full px-5 py-4 border-2 border-slate-700 rounded-xl focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 text-white bg-slate-800 text-lg placeholder-slate-500"
+            autocomplete="off"
+            class="block w-full ps-4 sm:ps-5 pe-3 py-3 sm:py-4 text-base sm:text-lg rounded-xl border border-yellow-400 focus:ring-yellow-400 focus:border-yellow-400 shadow-xs"
             placeholder="Your name"
           />
         </div>
@@ -44,63 +117,71 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div>
           <label 
             for="email" 
-            class="block text-base font-bold text-yellow-400 mb-3"
+            class="block mb-3 text-base font-bold text-yellow-400"
           >
             Email (optional)
           </label>
           <input
-            type="email"
+            type="text"
             id="email"
             name="email"
-            class="w-full px-5 py-4 border-2 border-slate-700 rounded-xl focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 text-white bg-slate-800 text-lg placeholder-slate-500"
+            autocomplete="off"
+            class="block w-full ps-4 sm:ps-5 pe-3 py-3 sm:py-4 text-base sm:text-lg rounded-xl border border-yellow-400 focus:ring-yellow-400 focus:border-yellow-400 shadow-xs"
             placeholder="your@email.com"
           />
         </div>
         
+        <!-- File Upload Field -->
+        <div>
+          <label 
+            for="content-file" 
+            class="block mb-3 text-base font-bold text-yellow-400"
+          >
+            Upload Content File (optional)
+          </label>
+          <p class="text-sm text-slate-400 mb-2">Upload a properly formatted markdown (.md) file with a new call action. See the guide above for formatting requirements.</p>
+          <input
+            type="file"
+            id="content-file"
+            name="content-file"
+            accept=".md,text/markdown"
+            class="block w-full ps-4 sm:ps-5 pe-3 py-3 sm:py-4 text-base sm:text-lg rounded-xl border border-yellow-400 focus:ring-yellow-400 focus:border-yellow-400 shadow-xs file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-yellow-400 file:text-slate-950 hover:file:bg-yellow-300 cursor-pointer"
+          />
+        </div>
+
         <!-- Message Field -->
         <div>
           <label 
             for="message" 
-            class="block text-base font-bold text-yellow-400 mb-3"
+            class="block mb-3 text-base font-bold text-yellow-400"
           >
             Your Suggestion
           </label>
           <textarea
             id="message"
             name="message"
-            rows="10"
-            required
-            class="w-full px-5 py-4 border-2 border-slate-700 rounded-xl focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 text-white bg-slate-800 resize-y text-lg placeholder-slate-500 leading-relaxed"
-            placeholder="Share your ideas, feedback, or suggestions for ActCA.now..."
+            rows="8"
+            autocomplete="off"
+            class="block w-full ps-4 sm:ps-5 pe-3 py-3 sm:py-4 text-base sm:text-lg rounded-xl border border-yellow-400 focus:ring-yellow-400 focus:border-yellow-400 shadow-xs resize-y leading-relaxed"
+            placeholder="Share your ideas, feedback, or suggestions for ActUp.Now..."
           ></textarea>
         </div>
         
-        <!-- Submit Button - Styled like the Tap to Call button -->
+        <!-- Submit Button - Flowbite Button Style -->
         <button
           type="submit"
-          class="call-cta w-full min-h-[72px] font-extrabold text-2xl rounded-2xl flex items-center justify-center text-center transition-all duration-200 active:scale-[0.98] cursor-pointer px-6 py-4 focus-visible:outline-none"
+          class="inline-flex items-center justify-center w-full min-h-[60px] sm:min-h-[72px] px-4 sm:px-6 py-3 sm:py-4 text-lg sm:text-xl md:text-2xl font-extrabold text-center text-slate-950 bg-yellow-400 rounded-2xl hover:bg-yellow-300 focus:ring-4 focus:ring-yellow-400 focus:outline-none transition-all duration-200 active:scale-[0.98] uppercase tracking-wide box-border border border-transparent shadow-xs"
         >
           <span class="flex items-center gap-3">
             <span aria-hidden="true">📤</span>
-            <span class="uppercase tracking-wide">Send Suggestion</span>
+            <span>Send Suggestion</span>
           </span>
         </button>
       </form>
       
-      <!-- Success/Error Messages -->
-      <div id="form-message" class="mt-4 hidden"></div>
+      <!-- Success/Error Messages - Flowbite Alert Style -->
+      <div id="form-message" class="hidden mt-4 p-4 mb-4 text-sm rounded-lg" role="alert"></div>
     </div>
-    
-    <!-- Navigation -->
-    <div class="text-center space-y-4">
-      <div class="flex gap-4 justify-center">
-        <a 
-          href="/resources"
-          class="inline-block px-6 py-3 bg-slate-800 text-yellow-400 font-semibold rounded-lg hover:bg-slate-700 transition-colors min-h-[48px] flex items-center justify-center"
-        >
-          📄 Resources
-        </a>
-      </div>
     </div>
   </main>
 </BaseLayout>
@@ -124,8 +205,32 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       
       try {
         const formData = new FormData(form);
+        
+        // Check if a file was uploaded
+        const fileInput = form.querySelector('#content-file');
+        const file = fileInput?.files?.[0];
+        
+        // Prepare data object
         const data = Object.fromEntries(formData.entries());
         
+        // If file is uploaded, read it and include in the payload
+        if (file) {
+          // Validate file type
+          if (!file.name.endsWith('.md') && file.type !== 'text/markdown' && file.type !== '') {
+            throw new Error('Please upload a markdown (.md) file');
+          }
+          
+          // Read file content as text
+          try {
+            const fileContent = await file.text();
+            data['content-file'] = fileContent;
+            data['content-filename'] = file.name;
+          } catch (readError) {
+            throw new Error('Failed to read file. Please try again.');
+          }
+        }
+        
+        // Always send as JSON
         const response = await fetch('/.netlify/functions/send-suggestion', {
           method: 'POST',
           headers: {
@@ -137,22 +242,54 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         const result = await response.json();
         
         if (response.ok && result.success) {
-          messageDiv.className = 'mt-4 p-4 bg-green-100 border-2 border-green-400 rounded-lg text-green-800 font-semibold';
-          messageDiv.textContent = '✓ Thank you! Your suggestion has been sent.';
+          messageDiv.className = 'mt-4 p-4 mb-4 text-sm text-success-strong bg-success-soft border border-success-subtle rounded-lg';
+          messageDiv.innerHTML = '<span class="font-medium">Success!</span> Thank you! Your suggestion has been sent.';
           messageDiv.classList.remove('hidden');
           form.reset();
+          // Clear file input explicitly
+          const fileInput = form.querySelector('#content-file');
+          if (fileInput) fileInput.value = '';
         } else {
           throw new Error(result.error || 'Failed to send suggestion');
         }
       } catch (error) {
-        messageDiv.className = 'mt-4 p-4 bg-red-100 border-2 border-red-400 rounded-lg text-red-800 font-semibold';
-        messageDiv.textContent = `✗ Error: ${error.message}. Please try again.`;
+        messageDiv.className = 'mt-4 p-4 mb-4 text-sm text-danger-strong bg-danger-soft border border-danger-subtle rounded-lg';
+        messageDiv.innerHTML = `<span class="font-medium">Error!</span> ${error.message}. Please try again.`;
         messageDiv.classList.remove('hidden');
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
       }
     });
+
+    // Ensure accordion is initialized after Flowbite loads
+    const initAccordion = () => {
+      import('flowbite').then(({ initFlowbite }) => {
+        initFlowbite();
+      }).catch(() => {
+        // Fallback: manual accordion toggle if Flowbite fails
+        const accordionButton = document.querySelector('#accordion-content-guide-heading button');
+        const accordionBody = document.querySelector('#accordion-content-guide-body');
+        if (accordionButton && accordionBody) {
+          accordionButton.addEventListener('click', () => {
+            const isExpanded = accordionButton.getAttribute('aria-expanded') === 'true';
+            accordionButton.setAttribute('aria-expanded', !isExpanded);
+            accordionBody.classList.toggle('hidden');
+            const icon = accordionButton.querySelector('[data-accordion-icon]');
+            if (icon) {
+              icon.classList.toggle('rotate-180');
+            }
+          });
+        }
+      });
+    };
+
+    // Initialize accordion when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAccordion);
+    } else {
+      initAccordion();
+    }
   })();
 </script>
 

@@ -1,0 +1,29 @@
+---
+description: Enforce strict Flowbite component usage - no custom CSS or inline styles
+globs: src/**/*.{astro,ts,js,css}
+---
+
+# Flowbite Component Standards
+
+**STRICT RULE: Use only Flowbite components from `flowbite-astro` and Tailwind utility classes. NO custom CSS classes, NO inline styles, NO style attributes.**
+
+## Required Components
+- Buttons → `<Button>` component
+- Cards → `<Card>`, `<CardHeader>`, `<CardBody>`, `<CardFooter>`
+- Forms → `<TextInput>`, `<Textarea>`, `<Label>`, `<Select>`
+- Badges → `<Badge>` component
+- Alerts → `<Alert>` component
+- Navigation → `<Navbar>`, `<ListGroup>`, `<ListGroupItem>`
+- Collapsible → `<Accordion>` or `<Collapse>` (never `<details>`)
+- Layout → Tailwind utilities only (`container`, `mx-auto`, `flex`, `grid`)
+
+## Forbidden
+- Custom CSS classes in global.css (except Tailwind `@import`)
+- Inline `style` attributes
+- Native HTML elements styled as components (use Flowbite components instead)
+- Custom utility classes
+
+## Allowed
+- Tailwind utility classes for layout/spacing
+- Flowbite component props for styling
+- Flowbite theme configuration in `tailwind.config.js`

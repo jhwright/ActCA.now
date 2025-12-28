@@ -24,58 +24,75 @@ const formattedPhone = formatPhoneNumber(data.phone);
 ---
 
 <div 
-  class="bg-slate-900 rounded-lg border border-slate-800 mb-4 flex flex-col"
-  style="max-height: calc(100vh - 8rem);"
+  class="flex flex-col mb-4 bg-slate-900 border border-yellow-400 rounded-lg max-h-[calc(100vh-8rem)]"
   data-call-card
   data-target-id={targetID}
 >
   <!-- Fixed Header Section -->
-  <div class="p-6 pb-4 flex-shrink-0">
-    <!-- Priority Flag -->
+  <div class="flex-shrink-0 p-4 sm:p-6 pb-4">
+    <!-- Priority Flag - Flowbite Badge -->
     {data.priority && (
       <div class="mb-3">
-        <span class="inline-block px-3 py-1 bg-yellow-400 text-slate-950 text-sm font-bold rounded">
+        <span class="bg-warning-soft text-fg-warning text-sm font-medium px-2 py-1 rounded">
           URGENT
         </span>
       </div>
     )}
     
     <!-- Official Info -->
-    <div class="mb-4">
-      <h3 class="text-xl font-bold text-yellow-400 mb-1">{data.officialName}, {data.officialTitle}</h3>
+    <div class="mb-2">
+      <h3 class="text-lg sm:text-xl font-bold text-yellow-400 break-words leading-tight">{data.officialName}</h3>
+      <p class="text-sm sm:text-base text-slate-400 break-words mt-1">{data.officialTitle}</p>
     </div>
   </div>
   
   <!-- Scrollable Content Area -->
-  <div class="flex-1 overflow-y-auto px-6 pb-4" data-call-scroll>
+  <div class="flex-1 px-4 sm:px-6 pb-4 overflow-y-auto" data-call-scroll>
     <!-- Script (sticky so it stays visible while you scroll on mobile) -->
-    <div class="call-script-sticky mb-4">
-      <p class="text-white text-lg font-semibold leading-relaxed" data-call-script>{data.script}</p>
+    <div class="sticky top-0 z-10 pt-1 pb-1 mb-4 bg-slate-900">
+      <p class="text-base sm:text-lg font-semibold leading-relaxed text-white break-words" data-call-script>{data.script}</p>
     </div>
     
-    <!-- No-JS rationale toggle -->
-    <details class="mb-4 bg-slate-800 rounded-lg border-2 border-slate-700">
-      <summary class="min-h-[48px] px-4 text-yellow-400 font-semibold text-base flex items-center justify-center hover:bg-slate-700 transition-colors cursor-pointer select-none">
-        ℹ️ Rationale
-      </summary>
-      <div class="p-4 border-t border-slate-700">
-        <p class="text-slate-300 text-sm leading-relaxed">{data.rationale}</p>
+    <!-- Flowbite Accordion for rationale -->
+    <div class="mb-4" id={`accordion-rationale-${targetID}`} data-accordion="collapse" data-active-classes="bg-slate-800">
+      <h2 id={`accordion-rationale-heading-${targetID}`}>
+        <button 
+          type="button"
+          class="flex items-center justify-between w-full min-h-[48px] sm:min-h-[56px] px-3 sm:px-4 text-sm sm:text-base font-semibold text-yellow-400 bg-slate-800 border border-yellow-400 rounded-lg hover:bg-slate-700 focus:ring-4 focus:ring-yellow-400 focus:outline-none transition-colors gap-2"
+          data-accordion-target={`#accordion-rationale-body-${targetID}`}
+          aria-expanded="false"
+          aria-controls={`accordion-rationale-body-${targetID}`}
+        >
+          <span class="text-left flex-shrink-0 pr-2">ℹ️ Rationale</span>
+          <svg data-accordion-icon class="w-3 h-3 sm:w-4 sm:h-4 rotate-180 shrink-0 flex-shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+          </svg>
+        </button>
+      </h2>
+      <div 
+        id={`accordion-rationale-body-${targetID}`} 
+        class="hidden"
+        aria-labelledby={`accordion-rationale-heading-${targetID}`}
+      >
+        <div class="p-3 sm:p-4 mt-2 bg-slate-800 rounded-lg">
+          <p class="text-sm sm:text-base leading-relaxed text-slate-300 break-words">{data.rationale}</p>
+        </div>
       </div>
-    </details>
+    </div>
   </div>
   
   <!-- Fixed Bottom Button -->
-  <div class="p-6 pt-4 flex-shrink-0">
-    <!-- Tap to Call Button - Styled like opening page buttons -->
+  <div class="flex-shrink-0 p-4 sm:p-6 pt-4">
+    <!-- Tap to Call Button - Flowbite Button Style -->
     <a
       href={`tel:${data.phone}`}
-      class="call-cta js-call-cta w-full min-h-[64px] font-extrabold text-2xl rounded-2xl flex items-center justify-center text-center transition-all duration-200 active:scale-[0.98] cursor-pointer px-5 py-3 focus-visible:outline-none"
+      class="js-call-cta inline-flex items-center justify-center w-full min-h-[56px] sm:min-h-[64px] px-4 sm:px-5 py-3 text-lg sm:text-xl md:text-2xl font-extrabold text-center text-slate-950 bg-yellow-400 rounded-2xl hover:bg-yellow-300 focus:ring-4 focus:ring-yellow-400 focus:outline-none transition-all duration-200 active:scale-[0.98] uppercase tracking-wide box-border border border-transparent shadow-xs"
       aria-label={`Call ${data.officialName} at ${formattedPhone}`}
     >
-      <span class="flex items-center gap-3">
+      <span class="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
         <span aria-hidden="true">📞</span>
-        <span class="uppercase tracking-wide">Tap to call</span>
-        <span class="opacity-90 font-black">{formattedPhone}</span>
+        <span>Tap to call</span>
+        <span class="font-black opacity-90 whitespace-nowrap">{formattedPhone}</span>
       </span>
     </a>
   </div>
@@ -114,8 +131,8 @@ const formattedPhone = formatPhoneNumber(data.phone);
         return;
       }
 
-    const key = `actca:callScroll:${targetID}`;
-    const zipKey = 'actca:zip';
+    const key = `actup:callScroll:${targetID}`;
+    const zipKey = 'actup:zip';
 
     const save = () => {
       try {
@@ -282,6 +299,31 @@ const formattedPhone = formatPhoneNumber(data.phone);
 
     // Initial load
     restore();
+    
+    // Ensure accordion is initialized
+    const initAccordion = () => {
+      import('flowbite').then(({ initFlowbite }) => {
+        initFlowbite();
+      }).catch(() => {
+        // Fallback: manual accordion toggle if Flowbite fails
+        const accordionButton = card.querySelector(`#accordion-rationale-heading-${targetID} button`);
+        const accordionBody = card.querySelector(`#accordion-rationale-body-${targetID}`);
+        if (accordionButton && accordionBody) {
+          accordionButton.addEventListener('click', () => {
+            const isExpanded = accordionButton.getAttribute('aria-expanded') === 'true';
+            accordionButton.setAttribute('aria-expanded', !isExpanded);
+            accordionBody.classList.toggle('hidden');
+            const icon = accordionButton.querySelector('[data-accordion-icon]');
+            if (icon) {
+              icon.classList.toggle('rotate-180');
+            }
+          });
+        }
+      });
+    };
+
+    // Initialize accordion after a short delay to ensure Flowbite is available
+    setTimeout(initAccordion, 100);
     
     console.log('CallCard script: Event listeners attached successfully');
     };

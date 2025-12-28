@@ -1,5 +1,5 @@
 ---
-topic: "education"
+title: "Education Autonomy"
 officialName: "Tony Thurmond"
 officialTitle: "California State Superintendent of Public Instruction"
 phone: "9163190800"

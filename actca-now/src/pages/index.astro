@@ -9,40 +9,26 @@ const allCalls = await getCollection('calls');
 
 <BaseLayout>
   <main class="relative min-h-screen bg-slate-900">
-    <!-- No-JS topic navigation (Safari-safe): rows are plain links to static pages -->
-    <div class="topic-table-container fixed left-8 top-28 sm:top-24 bottom-8 w-80 max-h-[calc(100vh-8rem)] overflow-y-auto">
-      <table class="w-full" style="border-collapse: separate; border-spacing: 0 10px;">
-        <tbody>
-          {allCalls.map((call) => {
-            const topicValue = call.data.topic;
-            const topicLabels = {
-              rail: 'High Speed Rail - NOW',
-              housing: 'YIMBY - Housing',
-              water: 'Water Sovereignty',
-              health: 'Universal Healthcare',
-              rights: 'Rights - Fight I.C.E.',
-              econ: 'CA $ for CA',
-              climate: 'Climate Action',
-              energy: 'Energy Independence',
-              education: 'Education Autonomy',
-            } as const;
-            const topicLabel = topicLabels[topicValue] ?? topicValue;
+    <!-- Flowbite ListGroup for call navigation -->
+    <div class="fixed left-0 right-0 md:left-8 md:right-auto top-24 bottom-8 w-full md:w-80 max-h-[calc(100vh-8rem)] overflow-y-auto px-4 md:px-0">
+      <div class="text-sm font-medium text-yellow-400 bg-slate-800 border border-yellow-400 rounded-lg">
+        {allCalls.map((call, index) => {
+          const callTitle = call.data.title;
+          const isFirst = index === 0;
+          const isLast = index === allCalls.length - 1;
+          const roundedClass = isFirst ? 'rounded-t-lg' : isLast ? 'rounded-b-lg' : '';
+          const borderClass = isLast ? '' : 'border-b border-yellow-400';
 
-            return (
-              <tr class="topic-row">
-                <td class="p-0">
-                  <a
-                    class="topic-row-button w-full font-bold text-lg border-2 border-yellow-400 bg-slate-800 text-yellow-400 p-3 text-center transition-colors block rounded-lg hover:bg-slate-700"
-                    href={`/call/${call.id}/`}
-                  >
-                    {topicLabel}
-                  </a>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+          return (
+            <a
+              href={`/call/${call.id}/`}
+              class={`block w-full px-4 py-3 text-lg font-bold text-yellow-400 ${roundedClass} ${borderClass} cursor-pointer hover:bg-slate-700 hover:text-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:text-yellow-300`}
+            >
+              {callTitle}
+            </a>
+          );
+        })}
+      </div>
     </div>
   </main>
 </BaseLayout>

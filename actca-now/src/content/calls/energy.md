@@ -1,5 +1,5 @@
 ---
-topic: "energy"
+title: "Energy Independence"
 officialName: "David Hochschild"
 officialTitle: "Chair, California Energy Commission"
 phone: "9166544989"

@@ -234,10 +234,11 @@ export const handler = async (event, context) => {
 
   try {
     // Parse request body
-    const { name, email, message } = JSON.parse(event.body || '{}');
+    const body = JSON.parse(event.body || '{}');
+    const { name, email, message, 'content-file': contentFile, 'content-filename': contentFilename } = body;
 
-    // Validate required fields
-    if (!message) {
+    // Validate: either message or content file must be provided
+    if (!message && !contentFile) {
       return {
         statusCode: 400,
         headers: {
@@ -245,10 +246,26 @@ export const handler = async (event, context) => {
           'Access-Control-Allow-Origin': '*',
         },
         body: JSON.stringify({ 
-          error: 'Message is required',
+          error: 'Either a message or content file is required',
           success: false,
         }),
       };
+    }
+
+    // If content file is provided, validate it
+    let fileValidationError = null;
+    if (contentFile) {
+      // Basic validation: check if it looks like a markdown file with frontmatter
+      if (!contentFile.includes('---')) {
+        fileValidationError = 'Content file must contain YAML frontmatter (enclosed in ---)';
+      } else {
+        // Check for required fields in frontmatter
+        const requiredFields = ['title', 'officialName', 'officialTitle', 'phone', 'script', 'rationale'];
+        const missingFields = requiredFields.filter(field => !contentFile.includes(`${field}:`));
+        if (missingFields.length > 0) {
+          fileValidationError = `Content file is missing required fields: ${missingFields.join(', ')}`;
+        }
+      }
     }
 
     // Extract IP address
@@ -261,17 +278,39 @@ export const handler = async (event, context) => {
       timestamp: new Date().toISOString(),
       name: name || 'Anonymous',
       email: email || 'Not provided',
-      message: message,
+      message: message || (contentFile ? `Content file uploaded: ${contentFilename || 'unnamed.md'}` : ''),
       ip: ip,
+      hasContentFile: !!contentFile,
+      contentFilename: contentFilename || null,
+      contentFilePreview: contentFile ? contentFile.substring(0, 500) + (contentFile.length > 500 ? '...' : '') : null,
+      fileValidationError: fileValidationError || null,
     };
 
     // Log suggestion
     console.log('Suggestion received:', {
       name: suggestionData.name,
       email: suggestionData.email,
-      message: message.substring(0, 100) + (message.length > 100 ? '...' : ''),
+      message: (message || '').substring(0, 100) + ((message || '').length > 100 ? '...' : ''),
+      hasContentFile: suggestionData.hasContentFile,
+      contentFilename: suggestionData.contentFilename,
+      fileValidationError: suggestionData.fileValidationError,
       timestamp: suggestionData.timestamp,
     });
+
+    // If file validation failed, return error
+    if (fileValidationError) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({
+          error: fileValidationError,
+          success: false,
+        }),
+      };
+    }
 
     // Write to Google Sheets (if configured) - wrapped in its own try-catch for safety
     let sheetsResult = { success: false, error: 'Not attempted' };

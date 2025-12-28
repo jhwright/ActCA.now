@@ -1,4 +1,4 @@
-## ActCA.now (Astro) — Deploy to Netlify via GitHub
+## ActUp.Now (Astro) — Deploy to Netlify via GitHub
 
 ### What you have
 - **App directory**: `actca-now/`
@@ -50,7 +50,7 @@ To enable phone number click tracking, you need to set up Google Sheets API auth
 1. In Google Cloud Console, go to **APIs & Services** → **Credentials**
 2. Click **+ CREATE CREDENTIALS** → **Service account**
 3. Fill in the service account details:
-   - **Service account name**: `actca-sheets-writer` (or any name you prefer)
+   - **Service account name**: `actup-sheets-writer` (or any name you prefer)
    - **Service account ID**: Auto-generated (you can change it)
    - Click **CREATE AND CONTINUE**
 4. Skip the optional steps (Grant access, Grant users access) and click **DONE**
