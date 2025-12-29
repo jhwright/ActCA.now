@@ -13,54 +13,42 @@ const uniqueStates = Array.from(new Set(allCalls.map(call => call.data.state)))
 
 <BaseLayout>
   <main class="relative min-h-screen bg-slate-900">
-    <!-- State Filter Dropdown and Location Button -->
-    <div class="fixed left-0 right-0 md:left-8 md:right-auto top-24 w-full md:w-80 px-4 md:px-0 mb-2 z-10">
-      <div class="flex flex-col gap-2">
-        <!-- State Filter Dropdown -->
-        <select
-          id="state-filter"
-          class="w-full px-4 py-2 text-lg font-semibold text-yellow-400 bg-slate-800 border border-yellow-400 rounded-lg hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-yellow-400 cursor-pointer"
-          aria-label="Filter calls by state"
-        >
-          <option value="ALL">All States</option>
-          {uniqueStates.map((state) => (
-            <option value={state}>{state}</option>
-          ))}
-        </select>
-        
-        <!-- Use My Location Button -->
-        <button
-          id="use-location-btn"
-          type="button"
-          class="w-full px-4 py-2 text-sm font-medium text-yellow-400 bg-slate-800 border border-yellow-400 rounded-lg hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-colors"
-          aria-label="Use my location to filter calls"
-        >
-          📍 Use My Location
-        </button>
-      </div>
-    </div>
+    <!-- Calls Table -->
+    <div class="fixed left-0 right-0 md:left-8 md:right-auto top-24 bottom-8 w-full md:w-80 max-h-[calc(100vh-8rem)] overflow-y-auto px-4 md:px-0">
+      <div class="bg-slate-800 border border-yellow-400 rounded-lg overflow-hidden">
+        <table class="w-full text-sm font-medium text-yellow-400" id="calls-table">
+          <thead class="bg-slate-900 border-b border-yellow-400">
+            <tr>
+              <th class="px-3 py-2 text-left text-xs font-semibold text-yellow-400 uppercase tracking-wider w-16">State</th>
+              <th class="px-3 py-2 text-left text-xs font-semibold text-yellow-400 uppercase tracking-wider">Title</th>
+            </tr>
+          </thead>
+          <tbody>
+            {allCalls.map((call) => {
+              const callTitle = call.data.title;
+              const callState = call.data.state;
 
-    <!-- Flowbite ListGroup for call navigation -->
-    <div class="fixed left-0 right-0 md:left-8 md:right-auto top-40 bottom-8 w-full md:w-80 max-h-[calc(100vh-12rem)] overflow-y-auto px-4 md:px-0">
-      <div class="text-sm font-medium text-yellow-400 bg-slate-800 border border-yellow-400 rounded-lg" id="calls-list">
-        {allCalls.map((call, index) => {
-          const callTitle = call.data.title;
-          const callState = call.data.state;
-          const isFirst = index === 0;
-          const isLast = index === allCalls.length - 1;
-          const roundedClass = isFirst ? 'rounded-t-lg' : isLast ? 'rounded-b-lg' : '';
-          const borderClass = isLast ? '' : 'border-b border-yellow-400';
-
-          return (
-            <a
-              href={`/call/${call.id}/`}
-              data-state={callState}
-              class={`call-item block w-full px-4 py-3 text-lg font-bold text-yellow-400 ${roundedClass} ${borderClass} cursor-pointer hover:bg-slate-700 hover:text-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:text-yellow-300`}
-            >
-              {callTitle}
-            </a>
-          );
-        })}
+              return (
+                <tr
+                  data-state={callState}
+                  class="call-item border-b border-yellow-400 hover:bg-slate-700 transition-colors last:border-b-0"
+                >
+                  <td class="px-3 py-3 text-sm font-medium text-yellow-400">
+                    {callState}
+                  </td>
+                  <td class="px-3 py-3">
+                    <a
+                      href={`/call/${call.id}/`}
+                      class="text-base font-bold text-yellow-400 hover:text-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:text-yellow-300 block"
+                    >
+                      {callTitle}
+                    </a>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   </main>
@@ -70,246 +58,130 @@ const uniqueStates = Array.from(new Set(allCalls.map(call => call.data.state)))
   (() => {
     const STORAGE_KEY = 'actup:state';
     const STATE_FILTER_ID = 'state-filter';
-    const USE_LOCATION_BTN_ID = 'use-location-btn';
     const CALL_ITEMS_SELECTOR = '.call-item';
 
-    // Get elements
-    const stateFilter = document.getElementById(STATE_FILTER_ID);
-    const useLocationBtn = document.getElementById(USE_LOCATION_BTN_ID);
-    const callItems = document.querySelectorAll(CALL_ITEMS_SELECTOR);
+    // Initialize function that waits for elements to be available
+    const initialize = () => {
+      // Get elements - filter might be in navbar or page
+      const stateFilter = document.getElementById(STATE_FILTER_ID);
+      const callItems = document.querySelectorAll(CALL_ITEMS_SELECTOR);
 
-    if (!stateFilter || !useLocationBtn) {
-      console.warn('State filter elements not found');
-      return;
-    }
+      if (!stateFilter) {
+        // Retry if filter not found yet (may be in BaseLayout)
+        setTimeout(initialize, 50);
+        return;
+      }
+      
+      if (callItems.length === 0) {
+        // Not on index page, no filtering needed
+        return;
+      }
 
-    // Filter calls by state
-    const filterCalls = (selectedState) => {
-      const items = Array.from(callItems);
-      const visibleItems = items.filter(item => {
-        const itemState = item.getAttribute('data-state');
-        return selectedState === 'ALL' || itemState === selectedState;
-      });
+      // Filter calls by state
+      const filterCalls = (selectedState) => {
+        const items = Array.from(callItems);
+        const visibleItems = items.filter(item => {
+          const itemState = item.getAttribute('data-state');
+          return selectedState === 'ALL' || itemState === selectedState;
+        });
 
-      items.forEach((item, index) => {
-        const itemState = item.getAttribute('data-state');
-        const shouldShow = selectedState === 'ALL' || itemState === selectedState;
-        
-        if (shouldShow) {
-          item.style.display = 'block';
-          const visibleIndex = visibleItems.indexOf(item);
-          const isFirst = visibleIndex === 0;
-          const isLast = visibleIndex === visibleItems.length - 1;
+        items.forEach((item) => {
+          const itemState = item.getAttribute('data-state');
+          const shouldShow = selectedState === 'ALL' || itemState === selectedState;
           
-          // Remove existing rounded classes
-          item.classList.remove('rounded-t-lg', 'rounded-b-lg');
-          if (isFirst) item.classList.add('rounded-t-lg');
-          if (isLast) item.classList.add('rounded-b-lg');
-          
-          // Update borders
-          if (!isLast) {
-            item.classList.add('border-b', 'border-yellow-400');
+          if (shouldShow) {
+            item.style.display = 'table-row';
+            // Ensure border is present unless it's the last visible item
+            const visibleIndex = visibleItems.indexOf(item);
+            const isLast = visibleIndex === visibleItems.length - 1;
+            
+            if (isLast) {
+              item.classList.remove('border-b');
+            } else {
+              item.classList.add('border-b');
+            }
           } else {
-            item.classList.remove('border-b', 'border-yellow-400');
+            item.style.display = 'none';
           }
-        } else {
-          item.style.display = 'none';
+        });
+      };
+
+      // Save state to localStorage
+      const saveState = (state) => {
+        try {
+          if (state === 'ALL') {
+            localStorage.removeItem(STORAGE_KEY);
+          } else {
+            localStorage.setItem(STORAGE_KEY, state);
+          }
+        } catch (e) {
+          console.warn('Failed to save state to localStorage:', e);
         }
+      };
+
+      // Get state from localStorage
+      const getStoredState = () => {
+        try {
+          return localStorage.getItem(STORAGE_KEY) || 'ALL';
+        } catch (e) {
+          return 'ALL';
+        }
+      };
+
+      // Get state from URL query parameter
+      const getStateFromURL = () => {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('state') || null;
+      };
+
+      // Handle state filter change
+      stateFilter.addEventListener('change', (e) => {
+        const selectedState = e.target.value;
+        filterCalls(selectedState);
+        saveState(selectedState);
+        
+        // Update URL without page reload
+        const url = new URL(window.location);
+        if (selectedState === 'ALL') {
+          url.searchParams.delete('state');
+        } else {
+          url.searchParams.set('state', selectedState);
+        }
+        window.history.replaceState({}, '', url);
       });
-    };
 
-    // Save state to localStorage
-    const saveState = (state) => {
-      try {
-        if (state === 'ALL') {
-          localStorage.removeItem(STORAGE_KEY);
-        } else {
-          localStorage.setItem(STORAGE_KEY, state);
-        }
-      } catch (e) {
-        console.warn('Failed to save state to localStorage:', e);
-      }
-    };
-
-    // Get state from localStorage
-    const getStoredState = () => {
-      try {
-        return localStorage.getItem(STORAGE_KEY) || 'ALL';
-      } catch (e) {
-        return 'ALL';
-      }
-    };
-
-    // Get state from URL query parameter
-    const getStateFromURL = () => {
-      const params = new URLSearchParams(window.location.search);
-      return params.get('state') || null;
-    };
-
-    // Reverse geocode coordinates to state using Nominatim (OpenStreetMap)
-    const reverseGeocode = async (lat, lon) => {
-      try {
-        // Use Nominatim API (no key required, but be respectful with rate limits)
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`,
-          {
-            headers: {
-              'User-Agent': 'ActCA.now/1.0' // Required by Nominatim
-            }
+      // Initialize: restore state from URL or localStorage
+      const initializeState = () => {
+        const urlState = getStateFromURL();
+        const storedState = getStoredState();
+        const initialState = urlState || storedState;
+        
+        // Always set the dropdown value and filter
+        if (initialState && initialState !== 'ALL') {
+          // Validate that the state exists in options
+          const option = Array.from(stateFilter.options).find(opt => opt.value === initialState);
+          if (option) {
+            stateFilter.value = initialState;
+            filterCalls(initialState);
+          } else {
+            stateFilter.value = 'ALL';
+            filterCalls('ALL');
           }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Geocoding failed: ${response.status}`);
-        }
-
-        const data = await response.json();
-        const address = data.address;
-        
-        // Extract state code from address components
-        const stateCode = address?.state_code || address?.ISO3166_2_lvl4?.split('-')[1];
-        
-        if (stateCode && stateCode.length === 2) {
-          return stateCode.toUpperCase();
-        }
-        
-        // Fallback: try to find state name and map to code
-        const stateName = address?.state;
-        if (stateName) {
-          // Simple mapping for common states (can be expanded)
-          const stateMap = {
-            'california': 'CA',
-            'new york': 'NY',
-            'texas': 'TX',
-            'florida': 'FL',
-            'illinois': 'IL',
-            'pennsylvania': 'PA',
-            'ohio': 'OH',
-            'georgia': 'GA',
-            'north carolina': 'NC',
-            'michigan': 'MI'
-          };
-          const normalized = stateName.toLowerCase();
-          return stateMap[normalized] || null;
-        }
-
-        return null;
-      } catch (error) {
-        console.error('Reverse geocoding error:', error);
-        return null;
-      }
-    };
-
-    // Use browser geolocation to detect user's state
-    const detectUserLocation = async () => {
-      if (!navigator.geolocation) {
-        alert('Geolocation is not supported by your browser.');
-        return null;
-      }
-
-      return new Promise((resolve) => {
-        useLocationBtn.disabled = true;
-        useLocationBtn.textContent = '📍 Detecting location...';
-
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            
-            useLocationBtn.textContent = '📍 Looking up state...';
-            
-            const stateCode = await reverseGeocode(latitude, longitude);
-            
-            useLocationBtn.disabled = false;
-            useLocationBtn.textContent = '📍 Use My Location';
-            
-            if (stateCode) {
-              resolve(stateCode);
-            } else {
-              alert('Unable to determine your state. Please select manually from the dropdown.');
-              resolve(null);
-            }
-          },
-          (error) => {
-            useLocationBtn.disabled = false;
-            useLocationBtn.textContent = '📍 Use My Location';
-            
-            if (error.code === error.PERMISSION_DENIED) {
-              alert('Location access denied. Please select your state manually from the dropdown.');
-            } else {
-              alert('Unable to get your location. Please select your state manually from the dropdown.');
-            }
-            resolve(null);
-          },
-          {
-            timeout: 10000,
-            enableHighAccuracy: false
-          }
-        );
-      });
-    };
-
-    // Handle state filter change
-    stateFilter.addEventListener('change', (e) => {
-      const selectedState = e.target.value;
-      filterCalls(selectedState);
-      saveState(selectedState);
-      
-      // Update URL without page reload (optional enhancement)
-      const url = new URL(window.location);
-      if (selectedState === 'ALL') {
-        url.searchParams.delete('state');
-      } else {
-        url.searchParams.set('state', selectedState);
-      }
-      window.history.replaceState({}, '', url);
-    });
-
-    // Handle use location button click
-    useLocationBtn.addEventListener('click', async () => {
-      const stateCode = await detectUserLocation();
-      if (stateCode) {
-        // Check if this state exists in the filter options
-        const option = Array.from(stateFilter.options).find(opt => opt.value === stateCode);
-        if (option) {
-          stateFilter.value = stateCode;
-          filterCalls(stateCode);
-          saveState(stateCode);
-          
-          // Update URL
-          const url = new URL(window.location);
-          url.searchParams.set('state', stateCode);
-          window.history.replaceState({}, '', url);
         } else {
-          alert(`State ${stateCode} is not available in the current calls. Showing all states.`);
-        }
-      }
-    });
-
-    // Initialize: restore state from URL or localStorage
-    const initializeState = () => {
-      const urlState = getStateFromURL();
-      const storedState = getStoredState();
-      const initialState = urlState || storedState;
-      
-      if (initialState && initialState !== 'ALL') {
-        // Validate that the state exists in options
-        const option = Array.from(stateFilter.options).find(opt => opt.value === initialState);
-        if (option) {
-          stateFilter.value = initialState;
-          filterCalls(initialState);
-        } else {
+          stateFilter.value = 'ALL';
           filterCalls('ALL');
         }
-      } else {
-        filterCalls('ALL');
-      }
+      };
+
+      // Initialize immediately
+      initializeState();
     };
 
     // Initialize on page load
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initializeState);
+      document.addEventListener('DOMContentLoaded', initialize);
     } else {
-      initializeState();
+      initialize();
     }
   })();
 </script>
