@@ -1,27 +1,152 @@
-## ActUp.Now (Astro) — Deploy to Netlify via GitHub
+# A Call a Day Keeps the Fascists Away
 
-### What you have
+**Democracy isn't a spectator sport.**
+
+A mobile-friendly web app that makes civic action effortless. Pre-written call scripts, one-tap dialing, zero friction.
+
+🌐 **[actca.now](https://actca.now)**  
+
+---
+
+## What It Does
+
+This site empowers citizens to directly contact state officials on the issues that matter most:
+
+| Issue | Description |
+|-------|-------------|
+| 🌍 Climate Action | Defend state climate sovereignty and emissions standards |
+| ⚡ Energy Independence | Accelerate renewable energy and grid resilience |
+| 🏥 Universal Healthcare | Champion state-run single-payer healthcare |
+| 🏠 Housing (YIMBY) | Streamline development and expand affordable housing |
+| 🚄 High-Speed Rail | Fund and complete state rail infrastructure |
+| 📚 Education Autonomy | Protect state curriculum from federal mandates |
+| ⚖️ Civil Rights | Defend reproductive freedom, LGBTQ+ equality, voting access |
+| 💧 Water Sovereignty | Ensure state control over water resources |
+| 💰 Economic Independence | Keep state tax dollars working in-state |
+
+### How It Works
+
+1. **Pick an issue** that matters to you
+2. **Read the script** (we wrote it for you)
+3. **Tap to call** your representative
+4. **Make your voice heard**
+
+---
+
+## Open Source & Configurable
+
+**This project is designed to work for any state—or nationally.**
+
+### Adding a New Call
+
+Create a markdown file in `src/content/calls/` with this format:
+
+```yaml
+---
+title: "Climate Action"
+officialName: "Jane Smith"
+officialTitle: "Secretary of Environmental Protection"
+phone: "5551234567"
+state: "NY"
+script: "Hi, I'm calling to urge Secretary Smith to..."
+rationale: "Why this matters..."
+priority: false
+---
+```
+
+### State Codes
+
+| Code | Scope |
+|------|-------|
+| `CA` | California |
+| `NY` | New York |
+| `TX` | Texas |
+| `USA` | Federal / National |
+
+The dropdown filter auto-populates from your content. Add calls for any state and they appear automatically.
+
+### Features
+
+- **State filter dropdown** — dynamically generated from content
+- **Geolocation button** — detects user's state automatically
+- **Shareable URLs** — `?state=NY` links to filtered views
+- **Mobile-first design** — tap-to-call works on any phone
+- **No backend required** — static site deploys anywhere
+
+---
+
+## Deploy Your Own
+
+### Quick Start
+
+1. **Fork the repository**
+
+2. **Add your markdown files**
+   ```
+   actca-now/src/content/calls/your-issue.md
+   ```
+
+3. **Push to GitHub**
+
+4. **Deploy to Netlify** (free tier works great)
+   - Connect your repo
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+   - Base directory: `actca-now`
+
+### Tech Stack
+
+- **Astro** — static site generator
+- **Tailwind CSS** — styling
+- **Flowbite** — UI components
+- **Netlify** — hosting & serverless functions
+
+---
+
+## Join the Movement
+
+California is leading the way. Who's next?
+
+**Fork it. Adapt it. Deploy it.**
+
+Let's build a national network of civic action sites.
+
+📞 **One call a day. Real impact.**
+
+*Your voice matters.*
+
+---
+
+## Technical Documentation
+
+### Project Structure
+
 - **App directory**: `actca-now/`
 - **Netlify config**: `netlify.toml` (repo root, with `base = "actca-now"`)
 - **Build output**: `actca-now/dist/`
 - **Netlify Functions**: `actca-now/functions/`
 
 ### Deploy (GitHub → Netlify)
+
 1. **Push to GitHub**
    - Create a GitHub repo and push this repository (the folder that contains `netlify.toml`).
+
 2. **Create a Netlify site from Git**
    - Netlify dashboard → **Add new site** → **Import an existing project**
    - Connect GitHub, pick the repo, choose the branch (e.g. `main`)
+
 3. **Build settings**
    - These are configured by `netlify.toml`, but you can confirm:
      - **Base directory**: `actca-now`
      - **Build command**: `npm run build`
      - **Publish directory**: `actca-now/dist` (Netlify will show `dist` when base dir is set)
      - **Functions directory**: `actca-now/functions` (Netlify will show `functions` when base dir is set)
+
 4. **Deploy**
    - Netlify will deploy on first import, then redeploy automatically on every push to the configured branch.
 
-### Local dev
+### Local Development
+
 From `actca-now/`:
 
 ```bash
@@ -29,9 +154,12 @@ npm install
 npm run dev
 ```
 
-### Netlify function endpoint
+### Netlify Function Endpoint
+
 After deploy, the function is available at:
 - `/.netlify/functions/log-call`
+
+---
 
 ## Google Sheets API Setup
 
@@ -115,6 +243,8 @@ To enable phone number click tracking, you need to set up Google Sheets API auth
 - **"Invalid credentials" errors**: Check that the JSON key is correctly pasted in Netlify environment variables (no extra spaces or line breaks if using Option A)
 - **No data appearing**: Check Netlify function logs (see Debugging section below)
 
+---
+
 ## Debugging & Error Logs
 
 ### Where to Find Logs
@@ -195,5 +325,3 @@ Check the response - it should include `sheetsLogged: true` if successful.
 **Issue: Headers not appearing in sheet**
 - The function tries to create headers automatically, but if the sheet doesn't exist, create it manually
 - Make sure the sheet tab name matches `GOOGLE_SHEETS_SHEET_NAME` (or "Events" if not set)
-
-
