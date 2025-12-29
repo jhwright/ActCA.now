@@ -10,7 +10,8 @@ const calls = defineCollection({
     phone: z.string(),
     script: z.string(),
     priority: z.boolean().default(false),
-    rationale: z.string()
+    rationale: z.string(),
+    state: z.string().length(2).transform(val => val.toUpperCase())
   }),
 });
 
